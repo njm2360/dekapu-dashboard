@@ -1,0 +1,2654 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 36,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "beyps6l9ombk0e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1h)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "総獲得",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "総獲得",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "総獲得推移",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "獲得速度(枚/min)",
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "獲得速度(枚/min)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "description": "9時リセット",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 4
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\ntoday_start = date.truncate(t: now(), unit: 1d, location: location)\r\ntoday_9 = date.add(to: today_start, d: 9h)\r\n\r\nyesterday_9 = date.add(to: today_9, d: -24h)\r\n\r\n// 現在が今日の9時より前なら昨日の9時、それ以降なら今日の9時\r\nstart = if now() < today_9 then yesterday_9 else today_9\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: start)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> reduce(\r\n      fn: (r, accumulator) => ({\r\n        first: if accumulator.initialized then accumulator.first else float(v: r._value),\r\n        last: float(v: r._value),\r\n        initialized: true\r\n      }),\r\n      identity: {first: 0.0, last: 0.0, initialized: false}\r\n    )\r\n  |> map(fn: (r) => ({_value: r.last - r.first}))\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "本日の総獲得",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "uid": "beyps6l9ombk0e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 0,
+        "y": 7
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"credit\")\r\n  |> filter(fn: (r) => r[\"user\"] == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "クレジット所持数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 0,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 6,
+        "y": 8
+      },
+      "id": 23,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.99,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -24h) // 直近24時間\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "1時間当たりの獲得数推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateSpectral",
+            "colorSpace": "rgb",
+            "groupBy": 60,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "min": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 24,
+      "options": {
+        "from": "0",
+        "legendGradientQuality": "high",
+        "regions": [],
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "time",
+        "to": "23",
+        "valueFieldName": "value"
+      },
+      "pluginVersion": "2.0.1",
+      "targets": [
+        {
+          "query": "import \"date\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      time: r._time,\r\n      value: r._value,\r\n  }))\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "獲得数ヒートマップ",
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 10
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"playtime\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "プレイ時間",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 10
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Ultimate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 13
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_start\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ルーレット回転",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 13
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_combomax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Ultimate最大コンボ",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "獲得回数",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "獲得回数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sqr_step"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "進行回数"
+              },
+              {
+                "id": "displayName",
+                "value": "進行回数"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 6,
+        "y": 15
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_step\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "B"
+        }
+      ],
+      "title": "すごろく",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "虹メダル獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 11,
+        "y": 15
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_100\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "虹メダル獲得数",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 16
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_hit\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ルーレット当選",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 16
+      },
+      "id": 27,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_totalmax_v2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Ultimate最終結果最高",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 19
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_getfev\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "フィーバー発生",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 19
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_startfev\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "フィーバー時回転",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 38,
+      "panels": [],
+      "title": "JACKPOT",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 23
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_startmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "S-JPスタート値最高",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 23
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_startmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "P-JPスタート値最高",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 6,
+        "y": 23
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"2段目\" }))",
+          "refId": "C"
+        },
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"3段目\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"最終段\" }))",
+          "refId": "B"
+        }
+      ],
+      "title": "パレッタチャンス挑戦回数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "S-JP 獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 13,
+        "y": 23
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "S-JP 獲得数",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "P-JP 獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 5,
+        "x": 19,
+        "y": 23
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "P-JP 獲得数",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 26
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_totalmax_v2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "S-JP最終結果最高",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 26
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_totalmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "P-JP最終結果最高",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 7,
+        "x": 6,
+        "y": 26
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"シングル\" }))",
+          "refId": "C"
+        },
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ダブル\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"マッシブ\" }))",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ヘブン\" }))",
+          "refId": "D"
+        }
+      ],
+      "title": "パレッタJACKPOT種別",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 29
+      },
+      "id": 39,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": " S-JP獲得回数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 29
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "P-JP獲得回数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 6,
+        "y": 29
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "PJP ボール獲得回数",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 40,
+      "panels": [],
+      "title": "ボール",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 33
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール獲得数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 11,
+        "x": 4,
+        "y": 33
+      },
+      "id": 42,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "percent",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_medal_get_0\" then \"銅メダル\"\r\n          else if r._field == \"dc_medal_get_1\" then \"銀メダル\"\r\n          else if r._field == \"dc_medal_get_14\" then \"金メダル\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール内訳推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 15,
+        "y": 33
+      },
+      "id": 43,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール獲得数推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "ボール獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 36
+      },
+      "id": 33,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール獲得数推移",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 37,
+      "panels": [],
+      "title": "メダル",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 44
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "メダル獲得数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 4,
+        "y": 44
+      },
+      "id": 35,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "horizontal",
+        "showValue": "never",
+        "stacking": "percent",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_medal_get_\" then \"銅メダル\"\r\n          else if r._field == \"dc_medal_get_\" then \"銀メダル\"\r\n          else if r._field == \"dc_medal_get_\" then \"金メダル\"\r\n          else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "メダル内訳推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 15,
+        "y": 44
+      },
+      "id": 34,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)",
+          "refId": "A"
+        }
+      ],
+      "title": "メダル獲得数推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 47
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_in\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "メダル投入数",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "桜谷 茉波",
+          "value": "桜谷 茉波"
+        },
+        "definition": "import \"influxdata/influxdb/schema\"\r\n\r\nschema.tagValues(\r\n  bucket: \"dekapu-log\",\r\n  tag: \"user\"\r\n)\r\n",
+        "description": "",
+        "label": "ユーザー名",
+        "name": "user",
+        "options": [],
+        "query": {
+          "query": "import \"influxdata/influxdb/schema\"\r\n\r\nschema.tagValues(\r\n  bucket: \"dekapu-log\",\r\n  tag: \"user\"\r\n)\r\n"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Tokyo",
+  "title": "でかプ実績",
+  "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
+  "version": 33
+}
