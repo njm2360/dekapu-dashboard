@@ -35,6 +35,7 @@ services:
   log-parser:
     build: ./log-parser
     container_name: log-parser
+    restart: unless-stopped
     depends_on:
       - influxdb
     volumes:
