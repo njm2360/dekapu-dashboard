@@ -1,0 +1,3 @@
+[submodule "log-parser"]
+	path = log-parser
+	url = https://github.com/njm2360/dekapu-log-parser
