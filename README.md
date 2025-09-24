@@ -3,12 +3,10 @@
 <img width="1919" height="933" alt="image" src="https://github.com/user-attachments/assets/7c2e9899-4ac5-4e80-adfd-c1fe94a22fc9" />
 <img width="1919" height="897" alt="image" src="https://github.com/user-attachments/assets/1aa65b81-522f-4b15-a262-8b67727a5ba9" />
 
-
-
 ## 前提条件
 
 - [Git](https://git-scm.com/)がインストールされていること
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) がインストールされていること  
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) がインストールされていること
 
 ## リポジトリの取得
 
@@ -39,7 +37,7 @@ VRCHAT_LOG_DIR=/host_mnt/c/Users/${USERNAME}/AppData/LocalLow/VRChat/VRChat
 またGrafanaやInfluxDBの初期ユーザー名やパスワード、トークンが記載されています。
 必要に応じてデフォルトから変更してください。
 
-`INFLUXDB_ORG`と`INFLUXDB_BUCKET`は変更しないでください。ダッシュボードが壊れます。
+`INFLUXDB_BUCKET`は変更しないでください。ダッシュボードが壊れます。
 
 ## 起動方法
 
@@ -49,14 +47,23 @@ docker compose up -d
 
 起動後:
 
-- Grafana → [http://localhost:3000](http://localhost:3000) （初期ユーザー: `admin` / `password`）  
+- Grafana → [http://localhost:3000](http://localhost:3000) （初期ユーザー: `admin` / `password`）
 - InfluxDB → [http://localhost:8086](http://localhost:8086)  （初期ユーザー: `admin` / `password`）
 
 Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシュボードがあります。
 起動後1時間程度はデータ不足のため一部のデータが`No data`という表示になる場合があります。
+データが全く表示されない場合はダッシュボード左上のユーザー名が入力されている確認してください。
 
 ## 停止方法
 
 ```bash
 docker compose down
+```
+
+## 更新方法
+
+```bash
+git pull
+docker compose down
+docker compose up -d --build
 ```
