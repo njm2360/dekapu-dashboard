@@ -2152,7 +2152,7 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ヘブン\" }))",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ヘブン\" }))",
           "refId": "D"
         }
       ],
@@ -3281,8 +3281,8 @@
     "list": [
       {
         "current": {
-          "text": "dekapu_debug",
-          "value": "dekapu_debug"
+          "text": "桜谷 茉波",
+          "value": "桜谷 茉波"
         },
         "definition": "import \"influxdata/influxdb/schema\"\r\n\r\nschema.tagValues(\r\n  bucket: \"dekapu-log\",\r\n  tag: \"user\"\r\n)\r\n",
         "description": "",
@@ -3299,12 +3299,12 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "Asia/Tokyo",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 46
+  "version": 47
 }
