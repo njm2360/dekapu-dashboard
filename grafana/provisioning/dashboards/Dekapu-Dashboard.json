@@ -464,7 +464,7 @@
           "showLegend": false
         },
         "orientation": "auto",
-        "showValue": "auto",
+        "showValue": "never",
         "stacking": "none",
         "tooltip": {
           "hideZeros": false,
@@ -477,7 +477,7 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -24h) // 直近24時間\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -24h) // 直近24時間\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n",
           "refId": "A"
         }
       ],
@@ -635,7 +635,7 @@
         "x": 3,
         "y": 10
       },
-      "id": 25,
+      "id": 54,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -656,11 +656,11 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "query": "import \"math\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"cpm_max\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: float(v: math.floor(x: r._value))\r\n      }))\r\n",
           "refId": "A"
         }
       ],
-      "title": "Ultimate",
+      "title": "最大獲得速度/min",
       "type": "stat"
     },
     {
@@ -751,7 +751,7 @@
         "x": 3,
         "y": 13
       },
-      "id": 26,
+      "id": 25,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -772,11 +772,11 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_combomax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "Ultimate最大コンボ",
+      "title": "Ultimate",
       "type": "stat"
     },
     {
@@ -1079,6 +1079,122 @@
         "x": 3,
         "y": 16
       },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_combomax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Ultimate最大コンボ",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 0,
+        "y": 19
+      },
+      "id": 50,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sp_use\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "スキルポイント使用数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 19
+      },
       "id": 27,
       "options": {
         "colorMode": "value",
@@ -1135,7 +1251,123 @@
         "h": 3,
         "w": 3,
         "x": 0,
-        "y": 19
+        "y": 22
+      },
+      "id": 51,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "タスク完了数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 3,
+        "y": 22
+      },
+      "id": 55,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"buy_shbi\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "シャルベ救出数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 6,
+        "y": 22
       },
       "id": 19,
       "options": {
@@ -1192,8 +1424,8 @@
       "gridPos": {
         "h": 3,
         "w": 3,
-        "x": 3,
-        "y": 19
+        "x": 9,
+        "y": 22
       },
       "id": 20,
       "options": {
@@ -1224,12 +1456,128 @@
       "type": "stat"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 12,
+        "y": 22
+      },
+      "id": 56,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"bstp_rwd\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボーナスステップ報酬回数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 15,
+        "y": 22
+      },
+      "id": 53,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"blackbox_credits\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ブラックボックスクレジット",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 25
       },
       "id": 38,
       "panels": [],
@@ -1264,7 +1612,7 @@
         "h": 3,
         "w": 3,
         "x": 0,
-        "y": 23
+        "y": 26
       },
       "id": 21,
       "options": {
@@ -1322,7 +1670,7 @@
         "h": 3,
         "w": 3,
         "x": 3,
-        "y": 23
+        "y": 26
       },
       "id": 28,
       "options": {
@@ -1380,13 +1728,13 @@
         "h": 3,
         "w": 7,
         "x": 6,
-        "y": 23
+        "y": 26
       },
       "id": 14,
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
+        "graphMode": "none",
+        "justifyMode": "center",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
@@ -1493,7 +1841,7 @@
         "h": 9,
         "w": 6,
         "x": 13,
-        "y": 23
+        "y": 26
       },
       "id": 41,
       "options": {
@@ -1584,7 +1932,7 @@
         "h": 9,
         "w": 5,
         "x": 19,
-        "y": 23
+        "y": 26
       },
       "id": 30,
       "options": {
@@ -1638,7 +1986,7 @@
         "h": 3,
         "w": 3,
         "x": 0,
-        "y": 26
+        "y": 29
       },
       "id": 22,
       "options": {
@@ -1696,7 +2044,7 @@
         "h": 3,
         "w": 3,
         "x": 3,
-        "y": 26
+        "y": 29
       },
       "id": 29,
       "options": {
@@ -1754,13 +2102,13 @@
         "h": 3,
         "w": 7,
         "x": 6,
-        "y": 26
+        "y": 29
       },
       "id": 16,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
@@ -1839,7 +2187,7 @@
         "h": 3,
         "w": 3,
         "x": 0,
-        "y": 29
+        "y": 32
       },
       "id": 39,
       "options": {
@@ -1897,7 +2245,7 @@
         "h": 3,
         "w": 3,
         "x": 3,
-        "y": 29
+        "y": 32
       },
       "id": 15,
       "options": {
@@ -1932,6 +2280,7 @@
         "type": "influxdb",
         "uid": "beyps6l9ombk0e"
       },
+      "description": "通常＋ゴールデンの合算",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1953,9 +2302,9 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
+        "w": 4,
         "x": 6,
-        "y": 29
+        "y": 32
       },
       "id": 10,
       "options": {
@@ -1982,7 +2331,65 @@
           "refId": "A"
         }
       ],
-      "title": "PJP ボール獲得回数",
+      "title": "パレッタボール獲得回数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 10,
+        "y": 32
+      },
+      "id": 46,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_palball_get_100\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ゴールデンパレッタボール獲得回数",
       "type": "stat"
     },
     {
@@ -1991,7 +2398,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 35
       },
       "id": 40,
       "panels": [],
@@ -2026,7 +2433,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 33
+        "y": 36
       },
       "id": 9,
       "options": {
@@ -2063,25 +2470,6 @@
       },
       "fieldConfig": {
         "defaults": {
-          "actions": [
-            {
-              "confirmation": "ふぇ",
-              "fetch": {
-                "body": "{}",
-                "headers": [
-                  [
-                    "Content-Type",
-                    "application/json"
-                  ]
-                ],
-                "method": "POST",
-                "queryParams": [],
-                "url": "localhost"
-              },
-              "title": "SAVE",
-              "type": "fetch"
-            }
-          ],
           "color": {
             "mode": "palette-classic"
           },
@@ -2091,8 +2479,6 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "axisSoftMax": 1,
-            "axisSoftMin": 0,
             "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
@@ -2115,6 +2501,10 @@
               {
                 "color": "green",
                 "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
@@ -2124,9 +2514,95 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 11,
+        "w": 10,
         "x": 4,
-        "y": 33
+        "y": 36
+      },
+      "id": 44,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 100
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール獲得数推移",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "actions": [],
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 101,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 36
       },
       "id": 42,
       "options": {
@@ -2136,31 +2612,30 @@
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "table",
+          "displayMode": "list",
           "placement": "right",
           "showLegend": true
         },
-        "orientation": "horizontal",
+        "orientation": "auto",
         "showValue": "never",
-        "stacking": "percent",
-        "text": {},
+        "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         },
         "xField": "Time",
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 300
+        "xTickLabelSpacing": 100
       },
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])",
+          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n  \r\n",
           "refId": "A"
         }
       ],
-      "title": "ボール内訳推移",
+      "title": "ボール獲得構成比",
       "type": "barchart"
     },
     {
@@ -2171,28 +2646,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -2204,49 +2658,43 @@
               }
             ]
           },
-          "unit": "sishort"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 9,
-        "x": 15,
-        "y": 33
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 39
       },
-      "id": 43,
+      "id": 52,
       "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
         "orientation": "auto",
-        "showValue": "never",
-        "stacking": "none",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "xField": "Time",
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 100
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_chain\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "ボール獲得数推移",
-      "type": "barchart"
+      "title": " 最大ボールナンバー",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -2313,7 +2761,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 36
+        "y": 42
       },
       "id": 33,
       "options": {
@@ -2340,12 +2788,134 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 4,
+        "y": 46
+      },
+      "id": 47,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 24
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "累計ボール獲得数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 46
+      },
+      "id": 48,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 24
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_chain_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_chain_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_chain_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_chain_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_chain_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_chain_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_chain_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_chain_6\" then \"白\"\r\n          else if r._field == \"dc_ball_chain_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_chain_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_chain_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_chain_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_chain_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_chain_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_chain_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_chain_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_chain_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_chain_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_chain_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_chain_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_chain_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_chain_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_chain_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_chain_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_chain_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボールチェイン数",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 54
       },
       "id": 37,
       "panels": [],
@@ -2380,7 +2950,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 44
+        "y": 55
       },
       "id": 8,
       "options": {
@@ -2426,8 +2996,6 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "axisSoftMax": 1,
-            "axisSoftMin": 0,
             "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
@@ -2459,11 +3027,11 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
+        "w": 10,
         "x": 4,
-        "y": 44
+        "y": 55
       },
-      "id": 35,
+      "id": 34,
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -2472,12 +3040,12 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
+          "placement": "bottom",
+          "showLegend": false
         },
-        "orientation": "horizontal",
+        "orientation": "auto",
         "showValue": "never",
-        "stacking": "percent",
+        "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
@@ -2485,16 +3053,16 @@
         },
         "xField": "Time",
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 300
+        "xTickLabelSpacing": 100
       },
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
           "refId": "A"
         }
       ],
-      "title": "メダル内訳推移",
+      "title": "メダル獲得数推移",
       "type": "barchart"
     },
     {
@@ -2513,6 +3081,8 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMax": 1,
+            "axisSoftMin": 0,
             "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
@@ -2528,7 +3098,9 @@
               "mode": "off"
             }
           },
+          "fieldMinMax": false,
           "mappings": [],
+          "max": 101,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -2538,17 +3110,17 @@
               }
             ]
           },
-          "unit": "sishort"
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
-        "w": 9,
-        "x": 15,
-        "y": 44
+        "w": 10,
+        "x": 14,
+        "y": 55
       },
-      "id": 34,
+      "id": 35,
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -2557,12 +3129,12 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
+          "placement": "right",
+          "showLegend": true
         },
         "orientation": "auto",
         "showValue": "never",
-        "stacking": "none",
+        "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
@@ -2575,11 +3147,11 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)",
+          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n",
           "refId": "A"
         }
       ],
-      "title": "メダル獲得数推移",
+      "title": "メダル獲得構成比",
       "type": "barchart"
     },
     {
@@ -2610,7 +3182,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 47
+        "y": 58
       },
       "id": 6,
       "options": {
@@ -2639,6 +3211,67 @@
       ],
       "title": "メダル投入数",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 49,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 24
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n          else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "累計メダル獲得数",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -2648,8 +3281,8 @@
     "list": [
       {
         "current": {
-          "text": "桜谷 茉波",
-          "value": "桜谷 茉波"
+          "text": "dekapu_debug",
+          "value": "dekapu_debug"
         },
         "definition": "import \"influxdata/influxdb/schema\"\r\n\r\nschema.tagValues(\r\n  bucket: \"dekapu-log\",\r\n  tag: \"user\"\r\n)\r\n",
         "description": "",
@@ -2666,12 +3299,12 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "Asia/Tokyo",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 36
+  "version": 43
 }
