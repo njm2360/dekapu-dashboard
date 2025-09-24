@@ -1,7 +1,7 @@
 # VRでかプ 統計ダッシュボード
 
-<img width="1919" height="933" alt="image" src="https://github.com/user-attachments/assets/7c2e9899-4ac5-4e80-adfd-c1fe94a22fc9" />
-<img width="1919" height="897" alt="image" src="https://github.com/user-attachments/assets/1aa65b81-522f-4b15-a262-8b67727a5ba9" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/f0025e93-9c3b-4d25-9d59-7ba84b016b08" />
+
 
 ## 前提条件
 
