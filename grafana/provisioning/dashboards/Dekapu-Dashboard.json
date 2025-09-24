@@ -2679,7 +2679,7 @@
         "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         },
         "xField": "Time",
@@ -3422,7 +3422,7 @@
     }
   ],
   "preload": false,
-  "refresh": "10s",
+  "refresh": "",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
@@ -3447,12 +3447,12 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "Asia/Tokyo",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 49
+  "version": 50
 }
