@@ -946,7 +946,7 @@
               "mode": "off"
             }
           },
-          "displayName": "虹メダル獲得数",
+          "displayName": "スキルメダル獲得数",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -3516,5 +3516,5 @@
   "timezone": "Asia/Tokyo",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 54
+  "version": 55
 }
