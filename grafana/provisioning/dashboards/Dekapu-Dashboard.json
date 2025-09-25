@@ -329,7 +329,7 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\ntoday_start = date.truncate(t: now(), unit: 1d, location: location)\r\ntoday_9 = date.add(to: today_start, d: 9h)\r\n\r\nyesterday_9 = date.add(to: today_9, d: -24h)\r\n\r\n// 現在が今日の9時より前なら昨日の9時、それ以降なら今日の9時\r\nstart = if now() < today_9 then yesterday_9 else today_9\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: start)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> reduce(\r\n      fn: (r, accumulator) => ({\r\n        first: if accumulator.initialized then accumulator.first else float(v: r._value),\r\n        last: float(v: r._value),\r\n        initialized: true\r\n      }),\r\n      identity: {first: 0.0, last: 0.0, initialized: false}\r\n    )\r\n  |> map(fn: (r) => ({_value: r.last - r.first}))\r\n",
+          "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> last()",
           "refId": "A"
         }
       ],
@@ -984,11 +984,11 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_100\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_7\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
           "refId": "A"
         }
       ],
-      "title": "虹メダル獲得数",
+      "title": "スキルメダル獲得数",
       "type": "timeseries"
     },
     {
@@ -2870,7 +2870,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 10,
         "x": 4,
         "y": 46
@@ -2911,6 +2911,69 @@
         "type": "influxdb",
         "uid": "beyps6l9ombk0e"
       },
+      "description": "日本標準時で午前9時を基準にリセット",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 10,
+        "x": 14,
+        "y": 46
+      },
+      "id": 59,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "query": "import \"timezone\"\r\nimport \"strings\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nball = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"ball_get\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\nballs = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field =~ /^dc_ball_get_/ and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\njoin(\r\n  tables: {balls: balls, ball: ball},\r\n  on: [\"_time\"],\r\n)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: if r._value_ball == 0.0 then 0.0 else float(v: r._value_balls) / float(v: r._value_ball) * 100.0\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field_balls\", \"_value\"])\r\n  |> difference(nonNegative: false, columns: [\"_value\"])\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field_balls:\r\n          if r._field_balls == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field_balls == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field_balls == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field_balls == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field_balls == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field_balls == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field_balls == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field_balls == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field_balls == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field_balls == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field_balls == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field_balls == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field_balls == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field_balls == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field_balls == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field_balls == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field_balls == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field_balls == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field_balls == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field_balls == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field_balls == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field_balls == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field_balls == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field_balls, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ボール獲得割合前日比",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2931,10 +2994,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 10,
-        "x": 14,
-        "y": 46
+        "x": 4,
+        "y": 53
       },
       "id": 48,
       "options": {
@@ -2973,7 +3036,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 60
       },
       "id": 37,
       "panels": [],
@@ -3008,7 +3071,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 55
+        "y": 61
       },
       "id": 8,
       "options": {
@@ -3087,7 +3150,7 @@
         "h": 10,
         "w": 10,
         "x": 4,
-        "y": 55
+        "y": 61
       },
       "id": 34,
       "options": {
@@ -3176,7 +3239,7 @@
         "h": 10,
         "w": 10,
         "x": 14,
-        "y": 55
+        "y": 61
       },
       "id": 35,
       "options": {
@@ -3240,7 +3303,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 58
+        "y": 64
       },
       "id": 6,
       "options": {
@@ -3321,10 +3384,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 4,
         "x": 0,
-        "y": 61
+        "y": 67
       },
       "id": 58,
       "options": {
@@ -3384,10 +3447,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 20,
         "x": 4,
-        "y": 65
+        "y": 71
       },
       "id": 49,
       "options": {
@@ -3422,7 +3485,6 @@
     }
   ],
   "preload": false,
-  "refresh": "",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
@@ -3454,5 +3516,5 @@
   "timezone": "Asia/Tokyo",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 50
+  "version": 54
 }
