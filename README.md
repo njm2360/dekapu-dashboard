@@ -1,7 +1,6 @@
 # VRでかプ 統計ダッシュボード
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/f0025e93-9c3b-4d25-9d59-7ba84b016b08" />
-
+<img width="1920" height="3079" alt="image" src="https://github.com/user-attachments/assets/e1ade4b6-88c1-4132-95a8-bffab90f29b4" />
 
 ## 前提条件
 
@@ -10,15 +9,17 @@
 
 ## リポジトリの取得
 
-```ps
+```bash
 git clone --recursive https://github.com/njm2360/dekapu-dashboard.git
 ```
+
+- Git submoduleを使用しているため`--recursive`オプションが必要です。必ず付与して実行してください。
 
 ## 環境変数の設定
 
 `.env.template` をコピーして `.env` を作成し、値を編集してください。
 
-```ps
+```bash
 cd dekapu-dashboard
 copy .env.template .env
 ```
@@ -41,9 +42,19 @@ VRCHAT_LOG_DIR=/host_mnt/c/Users/${USERNAME}/AppData/LocalLow/VRChat/VRChat
 
 ## 起動方法
 
-```ps
+```bash
 docker compose up -d
 ```
+
+- 実行時に`no configuration file provided`と表示されて起動できない場合はディレクトリが移動できていません。`cd dekapu-dashboard`でディレクトリを移動してから実行してください。
+
+### 自動起動について
+
+Windows環境でDocker Desktopを使用している場合は、以下の設定にチェックを入れてください。
+
+Settings -> General -> Start Docker Desktop when you sign in to your computer
+
+この設定を有効にした上で、一度だけ`docker compose up -d` を実行しておけば、以降はWindows起動時にDocker Desktopとともにコンテナも自動起動します。**毎回起動コマンドを実行する必要はありません**。
 
 起動後:
 
@@ -51,13 +62,13 @@ docker compose up -d
 - InfluxDB → [http://localhost:8086](http://localhost:8086)  （初期ユーザー: `admin` / `password`）
 
 Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシュボードがあります。
-起動後1時間程度はデータ不足のため一部のデータが`No data`という表示になる場合があります。
-データが全く表示されない場合はダッシュボード左上のユーザー名が入力されている確認してください。
+起動後1時間程度はデータ不足のため一部のパネルが`No data`と表示される場合があります。
+データが全く表示されない場合はダッシュボード左上のユーザー名が入力されていることを確認してください。
 
 ## 停止方法
 
 ```bash
-docker compose down
+docker compose stop
 ```
 
 ## 更新方法
