@@ -15,11 +15,25 @@
       }
     ]
   },
+  "description": "でかプの統計情報を表示します",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 1,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "GitHub",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://github.com/njm2360/dekapu-dashboard"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -3996,7 +4010,10 @@
   ],
   "preload": false,
   "schemaVersion": 41,
-  "tags": [],
+  "tags": [
+    "VRChat",
+    "でかプ"
+  ],
   "templating": {
     "list": [
       {
@@ -4028,8 +4045,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "Asia/Tokyo",
+  "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 58
+  "version": 59
 }
