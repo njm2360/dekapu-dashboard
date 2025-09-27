@@ -1,6 +1,6 @@
 # VRでかプ 統計ダッシュボード
 
-<img width="1920" height="3079" alt="image" src="https://github.com/user-attachments/assets/e1ade4b6-88c1-4132-95a8-bffab90f29b4" />
+<img width="1920" height="3345" alt="image" src="https://github.com/user-attachments/assets/b63bd627-4199-4ac4-982c-750c161fdcb4" />
 
 ## 前提条件
 
@@ -62,7 +62,7 @@ Settings -> General -> Start Docker Desktop when you sign in to your computer
 - InfluxDB → [http://localhost:8086](http://localhost:8086)  （初期ユーザー: `admin` / `password`）
 
 Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシュボードがあります。
-起動後1時間程度はデータ不足のため一部のパネルが`No data`と表示される場合があります。
+起動後1日程度はデータ不足のため一部のパネルが`No data`と表示される場合があります。
 データが全く表示されない場合はダッシュボード左上のユーザー名が入力されていることを確認してください。
 
 ## 停止方法
@@ -78,3 +78,12 @@ git pull
 docker compose down
 docker compose up -d --build
 ```
+
+## ダッシュボードの改造について
+
+ダッシュボードの中身は自由にカスタマイズ可能です。ただし初期で用意されているダッシュボードはプロビジョニングで自動配置されたもののため、変更を保存できません。
+
+ダッシュボードの改造をする場合は新規ダッシュボードを作成する画面から`grafana\provisioning\dashboards\Dekapu-Dashboard.json`を読み込み、
+ダッシュボード名とUIDを重複しないように変更してからインポートしてください。インポートしたダッシュボードに関してはユーザーで自由に改造可能です。
+
+注意: ユーザーで改造したダッシュボードは自動配置されたダッシュボードとは別扱いとなるため、`git pull`を使用した更新の対象外になりますのでご了承ください。
