@@ -10,10 +10,8 @@
 ## リポジトリの取得
 
 ```bash
-git clone --recursive https://github.com/njm2360/dekapu-dashboard.git
+git clone https://github.com/njm2360/dekapu-dashboard.git
 ```
-
-- Git submoduleを使用しているため`--recursive`オプションが必要です。必ず付与して実行してください。
 
 ## 環境変数の設定
 
