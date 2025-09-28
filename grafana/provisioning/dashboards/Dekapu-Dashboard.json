@@ -284,7 +284,7 @@
       "pluginVersion": "12.1.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
           "refId": "A"
         }
       ],
@@ -2446,6 +2446,7 @@
         "type": "influxdb",
         "uid": "beyps6l9ombk0e"
       },
+      "description": "数値が大きいほど遠心分離しゃる",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2535,6 +2536,7 @@
         "type": "influxdb",
         "uid": "beyps6l9ombk0e"
       },
+      "description": "小さいほどUMコンボを狙いやすい",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2575,8 +2577,7 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "sishort"
+          }
         },
         "overrides": []
       },
@@ -2853,7 +2854,7 @@
           "refId": "A"
         }
       ],
-      "title": "Ultimate",
+      "title": "Ultimate回数",
       "type": "stat"
     },
     {
@@ -2877,8 +2878,7 @@
                 "value": 0
               }
             ]
-          },
-          "unit": "locale"
+          }
         },
         "overrides": []
       },
@@ -3551,7 +3551,7 @@
           "refId": "A"
         }
       ],
-      "title": "ボールチェイン数",
+      "title": "最大ボールチェイン数",
       "type": "stat"
     },
     {
@@ -4017,6 +4017,7 @@
   "templating": {
     "list": [
       {
+        "allowCustomValue": true,
         "current": {
           "text": "dekapu_debug",
           "value": "dekapu_debug"
@@ -4048,5 +4049,5 @@
   "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 59
+  "version": 61
 }
