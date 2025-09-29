@@ -3,6 +3,8 @@ import logging
 from pathlib import Path
 from datetime import datetime, timedelta
 
+from aiohttp import ClientConnectorError
+
 from app.analysis.log_parser import MppLogParser
 from app.utils.offset_store import FileOffsetStore
 from app.utils.influxdb import InfluxWriterAsync
@@ -13,7 +15,7 @@ class VRChatLogWatcher:
         self.log_dir = log_dir
         self.influx = influx
         self.parsers: dict[str, MppLogParser] = {}
-        self.offset_store = FileOffsetStore(Path("log_offsets.json"))
+        self.offset_store = FileOffsetStore(Path("data") / "offsets.json")
 
         logging.info(f"[Watcher] Initialized. Log directory={log_dir}")
 
@@ -32,38 +34,68 @@ class VRChatLogWatcher:
 
         logging.info(f"[Watcher] Start watching file={fname}, offset={offset}")
 
-        with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
-            if offset is not None:
-                f.seek(offset)
-                logging.info(f"[Watcher] Resumed from offset {offset} ({fname})")
-            else:
-                f.seek(0, 2)
-                logging.info(f"[Watcher] Skip to EOF (no offset) ({fname})")
+        try:
+            with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                # オフセット情報をもとにシーク
+                if offset is not None:
+                    f.seek(offset)
+                    logging.info(f"[Watcher] Resumed from offset {offset} ({fname})")
+                else:
+                    f.seek(0, 2)
+                    logging.info(f"[Watcher] Skip to EOF (no offset) ({fname})")
 
-            last_activity = datetime.now()
-
-            while True:
-                line = f.readline().strip()
-
-                if not line:
-                    await asyncio.sleep(1)
-
-                    # 1時間更新がなければ監視を終了
-                    if datetime.now() - last_activity > timedelta(hours=1):
-                        logging.info(f"[Watcher] Stop watching {fname}")
-                        # 監視終了時に不要ならエントリ削除
-                        self.offset_store.remove(fname)
-                        break
-                    continue
-
-                # オフセット更新
-                self.offset_store.set(fname, f.tell())
                 last_activity = datetime.now()
 
-                point = parser.parse_line(line.strip())
-                if point:
-                    await self.influx.write(point)
-                    logging.debug(f"[Watcher] Data write OK ({fname})")
+                while True:
+                    try:
+                        line = f.readline().strip()
+                    except UnicodeDecodeError as e:
+                        logging.warning(f"[Watcher] Decode error in {fname}: {e}")
+                        continue
+                    except OSError as e:
+                        logging.error(f"[Watcher] File read error {fname}: {e}")
+                        break
+
+                    if not line:
+                        await asyncio.sleep(1)
+
+                        # 1時間更新がなければ監視を終了
+                        if datetime.now() - last_activity > timedelta(hours=1):
+                            logging.info(f"[Watcher] Stop watching {fname}")
+                            self.offset_store.remove(fname)
+                            break
+                        continue
+
+                    # オフセット更新
+                    self.offset_store.set(fname, f.tell())
+                    last_activity = datetime.now()
+
+                    point = parser.parse_line(line.strip())
+
+                    # InfluxDBに書込
+                    if point:
+                        try:
+                            await self.influx.write(point)
+                            logging.debug(f"[Watcher] Data write OK ({fname})")
+                        except ClientConnectorError as e:
+                            logging.error(f"[Watcher] InfluxDB connect error: {e}")
+                            await asyncio.sleep(5)
+                            continue
+                        except asyncio.TimeoutError:
+                            logging.error(f"[Watcher] InfluxDB write timeout ({fname})")
+                            await asyncio.sleep(5)
+                            continue
+                        except OSError as e:
+                            logging.error(
+                                f"[Watcher] InfluxDB write failed ({fname}): {e}"
+                            )
+                            await asyncio.sleep(5)
+                            continue
+
+        except FileNotFoundError:
+            logging.error(f"[Watcher] File not found: {fname}")
+        except PermissionError:
+            logging.error(f"[Watcher] Permission denied: {fname}")
 
     async def run(self):
         tasks: dict[str, asyncio.Task] = {}

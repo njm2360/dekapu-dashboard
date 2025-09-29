@@ -14,6 +14,7 @@ venv/
 .env
 *.log
 logs/
+data/
 
 .DS_Store
 Thumbs.db

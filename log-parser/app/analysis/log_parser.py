@@ -8,7 +8,7 @@ from typing import Final, Optional
 from influxdb_client import Point, WritePrecision
 from urllib.parse import urlparse, parse_qs, unquote
 
-from app.analysis.credit_speed import CreditSpeed
+from app.analysis.medal_rate_ema import MedalRateEMA
 
 
 class MppLogParser:
@@ -21,7 +21,7 @@ class MppLogParser:
 
     def __init__(self, fname: str):
         self.fname = fname
-        self.credit_calc = CreditSpeed()
+        self.medal_rate = MedalRateEMA()
         self.last_timestamp: Optional[datetime] = None
 
         # TZ環境変数がない場合はAsia/Tokyoとして解釈する
@@ -30,9 +30,7 @@ class MppLogParser:
             self.tz = ZoneInfo(tz_name)
         except Exception:
             # タイムゾーンが不正の場合はAsia/Tokyoとして解釈する
-            logging.warning(
-                f"[{self.fname}] Invalid timezone. ({tz_name})"
-            )
+            logging.warning(f"[{self.fname}] Invalid timezone. ({tz_name})")
             self.tz = ZoneInfo(self.DEFAULT_TZ)
 
     def _parse_timestamp_line(self, line: str):
@@ -48,52 +46,65 @@ class MppLogParser:
         except Exception as e:
             logging.warning(f"[{self.fname}] Failed to parse timestamp: {e}")
 
-    def parse_line(self, line: str) -> Point | None:
-        # タイムスタンプ行の検出
-        if self.TIMESTAMP_PREFIX in line:
-            self._parse_timestamp_line(line)
-            return None
-
-        # セーブデータ行の検出
-        if self.SAVEDATA_URL_PREFIX not in line:
-            return None
-
-        parsed = urlparse(line)
-        query = parse_qs(parsed.query)
-        raw_data = unquote(query.get("data", ["{}"])[0])
-
+    def parse_line(self, line: str) -> Optional[Point]:
         try:
-            data: dict[str, any] = json.loads(raw_data)
-        except json.JSONDecodeError as e:
-            logging.warning(f"[{self.fname}] JSON decode error: {e}")
+            # タイムスタンプ行の検出
+            if self.TIMESTAMP_PREFIX in line:
+                self._parse_timestamp_line(line)
+                return None
+
+            # セーブデータ行の検出
+            if self.SAVEDATA_URL_PREFIX not in line:
+                return None
+
+            parsed = urlparse(line)
+            query = parse_qs(parsed.query)
+            raw_data = unquote(query.get("data", ["{}"])[0])
+
+            try:
+                data: dict[str, any] = json.loads(raw_data)
+            except json.JSONDecodeError as e:
+                logging.warning(f"[{self.fname}] JSON decode error: {e}")
+                return None
+
+            user_id = query.get("user_id", [""])[0]
+            credit_all = data.get("credit_all")
+
+            # タイムスタンプが未取得の場合、現在時刻で書き込む
+            timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
+            if not self.last_timestamp:
+                logging.warning(
+                    f"[{self.fname}] No timestamp captured, fallback to now()"
+                )
+
+            p = (
+                Point("mpp-savedata")
+                .tag("user", user_id)
+                .time(timestamp, WritePrecision.NS)
+            )
+
+            for k, v in data.items():
+                if isinstance(v, (int, float, str)):
+                    p = p.field(k, v)
+                elif isinstance(v, dict) and k.startswith("dc_"):
+                    # dc_から始まるものは子要素のキー名をアンダースコアで結合して追加
+                    for sub_k, sub_v in v.items():
+                        if isinstance(sub_v, (int, float, str)):
+                            p = p.field(f"{k}_{sub_k}", sub_v)
+
+            if credit_all is not None:
+                delta = self.medal_rate.update(credit_all, timestamp)
+                if delta is not None:
+                    p = p.field("credit_all_delta_1m", delta)
+
+            return p
+
+        except UnicodeDecodeError as e:
+            logging.error(f"[{self.fname}] Encoding error in line: {e}")
             return None
-
-        user_id = query.get("user_id", [""])[0]
-        credit_all = data.get("credit_all")
-
-        # タイムスタンプが未取得の場合、現在時刻で書き込む
-        timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
-        if not self.last_timestamp:
-            logging.warning(f"[{self.fname}] No timestamp captured, fallback to now()")
-
-        p = (
-            Point("mpp-savedata")
-            .tag("user", user_id)
-            .time(timestamp, WritePrecision.NS)
-        )
-
-        for k, v in data.items():
-            if isinstance(v, (int, float, str)):
-                p = p.field(k, v)
-            elif isinstance(v, dict) and k.startswith("dc_"):
-                # dc_から始まるものは子要素のキー名をアンダースコアで結合して追加
-                for sub_k, sub_v in v.items():
-                    if isinstance(sub_v, (int, float, str)):
-                        p = p.field(f"{k}_{sub_k}", sub_v)
-
-        if credit_all is not None:
-            delta = self.credit_calc.add(credit_all, timestamp)
-            if delta is not None:
-                p = p.field("credit_all_delta_1m", delta)
-
-        return p
+        except (TypeError, KeyError) as e:
+            logging.error(f"[{self.fname}] Unexpected data format: {e}")
+            return None
+        except Exception as e:
+            logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
+            return None

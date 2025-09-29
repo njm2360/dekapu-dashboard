@@ -5,11 +5,11 @@ from typing import Deque, Tuple, Optional
 from app.utils.interpolation import linear_interpolate
 
 
-class CreditSpeed:
+class MedalRate:
     def __init__(self):
         self.history: Deque[Tuple[datetime, int]] = deque()
 
-    def add(self, credit_all: int, timestamp: datetime) -> Optional[int]:
+    def update(self, credit_all: int, timestamp: datetime) -> Optional[int]:
         self.history.append((timestamp, credit_all))
 
         # 2分より古いデータを削除

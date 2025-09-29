@@ -7,6 +7,7 @@ from typing import Optional
 class FileOffsetStore:
     def __init__(self, filepath: Path):
         self._filepath = filepath
+        self._filepath.parent.mkdir(parents=True, exist_ok=True)
         self._offsets: dict[str, int] = self._load()
         logging.info(
             f"[OffsetStore] Initialized with file={self._filepath}, "
