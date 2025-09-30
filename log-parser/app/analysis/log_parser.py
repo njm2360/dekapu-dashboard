@@ -112,7 +112,7 @@ class MppLogParser:
             logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
             return None
 
-    def fix_overflow(value: int, bits: int = 32):
+    def fix_overflow(self, value: int, bits: int = 32):
         if value < 0:
             mask = (1 << bits) - 1
             return value & mask
