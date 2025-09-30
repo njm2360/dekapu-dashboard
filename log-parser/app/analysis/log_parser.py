@@ -85,11 +85,14 @@ class MppLogParser:
 
             for k, v in data.items():
                 if isinstance(v, (int, float, str)):
+                    if isinstance(v, int):
+                        v = self.fix_overflow(v, 32)
                     p = p.field(k, v)
                 elif isinstance(v, dict) and k.startswith("dc_"):
-                    # dc_から始まるものは子要素のキー名をアンダースコアで結合して追加
                     for sub_k, sub_v in v.items():
                         if isinstance(sub_v, (int, float, str)):
+                            if isinstance(sub_v, int):
+                                sub_v = self.fix_overflow(sub_v, 32)
                             p = p.field(f"{k}_{sub_k}", sub_v)
 
             if credit_all is not None:
@@ -108,3 +111,9 @@ class MppLogParser:
         except Exception as e:
             logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
             return None
+
+    def fix_overflow(value: int, bits: int = 32):
+        if value < 0:
+            mask = (1 << bits) - 1
+            return value & mask
+        return value
