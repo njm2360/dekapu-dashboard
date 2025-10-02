@@ -14,6 +14,7 @@ from app.analysis.medal_rate_ema import MedalRateEMA
 class MppLogParser:
     SAVEDATA_URL_PREFIX: Final[str] = "https://push.trap.games/api/v3/data"
     TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
+    CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
 
     TIMESTAMP_RE = re.compile(r"^(\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2})")
 
@@ -51,6 +52,12 @@ class MppLogParser:
             # タイムスタンプ行の検出
             if self.TIMESTAMP_PREFIX in line:
                 self._parse_timestamp_line(line)
+                return None
+
+            # クラウドロードの検出
+            if self.CLOUD_LOAD_MSG in line:
+                logging.info(f"[{self.fname}] Cloud load detected. Reset medal rate.")
+                self.medal_rate.reset()
                 return None
 
             # セーブデータ行の検出

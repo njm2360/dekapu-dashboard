@@ -31,3 +31,8 @@ class MedalRateEMA:
         self.last_total = total
 
         return int(self.ema_rate)
+
+    def reset(self) -> None:
+        self.last_timestamp = None
+        self.last_total = None
+        self.ema_rate = 0.0
