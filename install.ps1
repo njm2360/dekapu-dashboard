@@ -9,15 +9,7 @@ if (-not $IsAdmin) {
     $url = "https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1"
 
     Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
-    $content = Get-Content $tmp -Raw
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
-        Set-Content -Path $tmp -Value $content -Encoding utf8BOM
-    } else {
-        Set-Content -Path $tmp -Value $content -Encoding UTF8
-    }
-
     Start-Process powershell -Verb RunAs -ArgumentList "-NoExit", "-ExecutionPolicy Bypass -File `"$tmp`""
-
     exit 0
 }
 
@@ -88,11 +80,21 @@ cd $dir
 
 # Docker Executable
 $dockerExe = "$env:ProgramFiles\Docker\Docker\resources\bin\docker.exe"
+$dockerDesktopExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
 
 if (-not (Test-Path $dockerExe)) {
     Write-Host "Docker not found. Aborting process."
     exit 1
 }
+if (-not (Test-Path $dockerDesktopExe)) {
+    Write-Host "Docker Desktop not found. Aborting process."
+    exit 1
+}
+
+# Ensure Docker Desktop is running
+Write-Host "Starting Docker Desktop..."
+Start-Process -FilePath $dockerDesktopExe
+
 
 # Wait for Docker Engine starting
 Write-Host "Waiting for Docker Engine to start..."
