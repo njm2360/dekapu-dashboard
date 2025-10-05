@@ -1,0 +1,109 @@
+$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+Remove-ItemProperty -Path $regPath -Name "PostInstallScript" -ErrorAction SilentlyContinue
+
+$IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+# Check permission
+if (-not $IsAdmin) {
+    $tmp = "$env:TEMP\bootstrap_elevated.ps1"
+    $url = "https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1"
+
+    Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
+    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`""
+
+    exit 0
+}
+
+# Check Winget
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Host "Wingetが見つかりません。Windows 10の場合はApp Installerを更新してください。"
+    exit 1
+}
+
+# Install Git
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Host "Gitをインストールしています..."
+    winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
+}
+
+# Install Docker Desktop
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "Docker Desktopをインストールしています..."
+    Invoke-WebRequest "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
+    Start-Process -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install", "--quiet", "--accept-license" -Wait
+}
+
+# Configure Autostart
+$dockerSettings = "$env:APPDATA\Docker\settings-store.json"
+
+$dockerDir = Split-Path $dockerSettings
+if (-not (Test-Path $dockerDir)) {
+    New-Item -ItemType Directory -Path $dockerDir | Out-Null
+}
+
+$jsonContent = @{
+    AutoStart = $true
+    OpenUIOnStartupDisabled = $true
+} | ConvertTo-Json -Depth 2
+
+$jsonContent | Set-Content -Path $dockerSettings -Encoding UTF8
+
+# Install WSL2 for Docker backend
+$wslFeature = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+$vmFeature  = Get-WindowsOptionalFeature -Oanline -FeatureName VirtualMachinePlatform
+
+if ($wslFeature.State -ne 'Enabled' -or $vmFeature.State -ne 'Enabled') {
+    Write-Host "WSL機能を有効化しています..."
+    try {
+        wsl --install --no-distribution
+    } catch {
+        Write-Host "❌ WSLのインストールに失敗しました。処理を中止します。"
+        exit 1
+    }
+
+    $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+    Set-ItemProperty -Path $regPath -Name "PostInstallScript" -Value "powershell -ExecutionPolicy Bypass -File `"$PSScriptRoot\install.ps1`""
+    Restart-Computer
+    exit 0
+}
+
+# Clone repository
+$repo = "https://github.com/njm2360/dekapu-dashboard.git"
+$dir = "$env:USERPROFILE\dekapu-dashboard"
+if (-not (Test-Path $dir)) {
+    git clone $repo $dir
+}
+cd $dir
+
+# Set environment
+(Get-Content ".env.template") -replace '^USERNAME=.*', "USERNAME=$env:USERNAME" | Set-Content ".env"
+
+# Docker Executable
+$dockerExe = "$env:ProgramFiles\Docker\Docker\resources\bin\docker.exe"
+
+if (-not (Test-Path $dockerExe)) {
+    Write-Host "Dockerが見つかりません。処理を中止します。"
+    exit 1
+}
+
+# Wait for Docker Engine starting
+Write-Host "Docker Engineの起動を待機しています..."
+$maxWait = 300
+$elapsed = 0
+while ($true) {
+    try {
+        & $dockerExe info | Out-Null
+        break
+    } catch {
+        if ($elapsed -ge $maxWait) {
+            Write-Host "Docker Engineが起動しませんでした。処理を中止します。"
+            exit 1
+        }
+    }
+    Start-Sleep -Seconds 5
+    $elapsed += 5
+}
+
+# Launch docker containers
+Write-Host "Dockerコンテナを起動しています..."
+& $dockerExe compose up -d
