@@ -28,12 +28,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 # Install Docker Desktop
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Docker Desktop..."
-
-    $ProgressPreference = 'SilentlyContinue'
-    Invoke-WebRequest "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
-    $ProgressPreference = 'Continue'
-
-    Start-Process -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install", "--quiet", "--accept-license" -Wait
+    winget install --id Docker.DockerDesktop -e --accept-source-agreements --accept-package-agreements --override "install --quiet --accept-license"
 }
 
 # Configure Autostart
@@ -69,6 +64,19 @@ if ($wslFeature.State -ne 'Enabled' -or $vmFeature.State -ne 'Enabled') {
     Set-ItemProperty -Path $regPath -Name "PostInstallScript" -Value "powershell -ExecutionPolicy Bypass -File `"$env:TEMP\bootstrap_elevated.ps1`""
     Restart-Computer
     exit 0
+}
+
+# Git path
+$gitBin = "$env:ProgramFiles\Git\cmd"
+
+# Ensure PATH includes Git
+if (-not ($env:PATH -like "*$gitBin*")) {
+    if (Test-Path $gitBin) {
+        Write-Host "Temporarily adding Git to PATH..."
+        $env:PATH = "$env:PATH;$gitBin"
+    } else {
+        Write-Host "Git not found at expected path: $gitBin"
+    }
 }
 
 # Clone repository
