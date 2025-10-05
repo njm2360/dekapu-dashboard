@@ -82,30 +82,26 @@ cd $dir
 # Set environment
 (Get-Content ".env.template") -replace '^USERNAME=.*', "USERNAME=$env:USERNAME" | Set-Content ".env"
 
-# Docker Executable
-$dockerExe = "$env:ProgramFiles\Docker\Docker\resources\bin\docker.exe"
+# Docker paths
+$dockerBin = "$env:ProgramFiles\Docker\Docker\resources\bin"
 $dockerDesktopExe = "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
 
-if (-not (Test-Path $dockerExe)) {
-    Write-Host "Docker not found. Aborting process."
-    exit 1
-}
-if (-not (Test-Path $dockerDesktopExe)) {
-    Write-Host "Docker Desktop not found. Aborting process."
-    exit 1
+# Ensure PATH includes Docker resources
+if (-not ($env:PATH -like "*$dockerBin*")) {
+    Write-Host "Temporarily adding Docker resources to PATH..."
+    $env:PATH = "$env:PATH;$dockerBin"
 }
 
-# Ensure Docker Desktop is running
+# Start Docker Desktop
 Write-Host "Starting Docker Desktop..."
 Start-Process -FilePath $dockerDesktopExe
-
 
 # Wait for Docker Engine starting
 Write-Host "Waiting for Docker Engine to start..."
 $maxWait = 300
 $elapsed = 0
 while ($true) {
-    & $dockerExe info *> $null
+    docker info *> $null
     if ($LASTEXITCODE -eq 0) {
         break
     }
@@ -119,4 +115,4 @@ while ($true) {
 
 # Launch docker containers
 Write-Host "Starting Docker containers..."
-& $dockerExe compose up -d
+docker compose up -d
