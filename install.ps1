@@ -28,7 +28,11 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 # Install Docker Desktop
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Docker Desktop..."
+
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
+    $ProgressPreference = 'Continue'
+
     Start-Process -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install", "--quiet", "--accept-license" -Wait
 }
 
