@@ -1,4 +1,4 @@
-$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+﻿$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 Remove-ItemProperty -Path $regPath -Name "PostInstallScript" -ErrorAction SilentlyContinue
 
 $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -9,7 +9,14 @@ if (-not $IsAdmin) {
     $url = "https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1"
 
     Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
-    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`""
+    $content = Get-Content $tmp -Raw
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        Set-Content -Path $tmp -Value $content -Encoding utf8BOM
+    } else {
+        Set-Content -Path $tmp -Value $content -Encoding UTF8
+    }
+
+    Start-Process powershell -Verb RunAs -ArgumentList "-NoExit", "-ExecutionPolicy Bypass -File `"$tmp`""
 
     exit 0
 }
@@ -50,7 +57,7 @@ $jsonContent | Set-Content -Path $dockerSettings -Encoding UTF8
 
 # Install WSL2 for Docker backend
 $wslFeature = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-$vmFeature  = Get-WindowsOptionalFeature -Oanline -FeatureName VirtualMachinePlatform
+$vmFeature  = Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
 
 if ($wslFeature.State -ne 'Enabled' -or $vmFeature.State -ne 'Enabled') {
     Write-Host "WSL機能を有効化しています..."
