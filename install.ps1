@@ -1,11 +1,11 @@
 $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-Remove-ItemProperty -Path $regPath -Name "PostInstallScript" -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path $regPath -Name "dekapu-dashboard-setup" -ErrorAction SilentlyContinue
 
 $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 # Check permission
 if (-not $IsAdmin) {
-    $tmp = "$env:TEMP\bootstrap_elevated.ps1"
+    $tmp = "$env:TEMP\dekapu-dashboard-setup.ps1"
     $url = "https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1"
 
     Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
@@ -48,11 +48,38 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($dockerSettings, $jsonContent, $utf8NoBom)
 
 # Install WSL2 for Docker backend
-$wslFeature = Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-$vmFeature  = Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
+Write-Host "Checking WSL installation status..."
 
-if ($wslFeature.State -ne 'Enabled' -or $vmFeature.State -ne 'Enabled') {
-    Write-Host "Enabling WSL feature..."
+if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) {
+    Write-Host "wsl.exe not found. This system may not support WSL."
+    exit 1
+}
+
+$proc = New-Object System.Diagnostics.Process -Property @{
+    StartInfo = New-Object System.Diagnostics.ProcessStartInfo -Property @{
+        FileName = "wsl.exe"
+        Arguments = "-l -v"
+        RedirectStandardOutput = $true
+        RedirectStandardError  = $true
+        UseShellExecute = $false
+        CreateNoWindow = $true
+    }
+}
+
+$proc.Start() | Out-Null
+
+if (-not $proc.WaitForExit(5000)) {
+    Write-Host "WSL check timed out (possible uninstalled state)."
+    try { $proc.Kill() } catch {}
+    $exitCode = 1
+} else {
+    $exitCode = $proc.ExitCode
+}
+
+if ($exitCode -eq 0 -or $exitCode -eq -1) {
+    Write-Host "WSL is already installed."
+} else {
+    Write-Host "WSL not installed. Enabling WSL feature..."
     try {
         wsl --install --no-distribution
     } catch {
@@ -61,7 +88,7 @@ if ($wslFeature.State -ne 'Enabled' -or $vmFeature.State -ne 'Enabled') {
     }
 
     $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-    Set-ItemProperty -Path $regPath -Name "PostInstallScript" -Value "powershell -ExecutionPolicy Bypass -File `"$env:TEMP\bootstrap_elevated.ps1`""
+    Set-ItemProperty -Path $regPath -Name "dekapu-dashboard-setup" -Value "powershell -ExecutionPolicy Bypass -File `"$env:TEMP\dekapu-dashboard-setup.ps1`""
     Restart-Computer
     exit 0
 }
