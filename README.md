@@ -2,18 +2,48 @@
 
 <img width="1920" height="3345" alt="image" src="https://github.com/user-attachments/assets/b63bd627-4199-4ac4-982c-750c161fdcb4" />
 
-## 前提条件
+## インストール方法
+
+以下のコマンドを`ファイル名を指定して実行`に貼り付けて実行してください。(スタートボタンを右クリック -> `ファイル名を指定して実行`)
+
+```bash
+powershell -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1 | iex
+```
+
+【注意】
+
+- 自動で再起動が行われる場合がありますのでインストール前に作業中のアプリケーションは終了しておいてください。
+- インストールはパソコンのスペックやインターネット速度によって時間がかかります。ご了承ください。
+- 実行時に管理者権限を要求するUAC許可ダイアログが出ますので許可してください。
+- Docker起動時にアカウントを求められますがスキップして問題ありません。
+
+## 使用方法
+
+基本的にウェブブラウザからアクセスして使用します。
+
+- Grafana → [http://localhost:3000](http://localhost:3000) （初期ユーザー: `admin` / `password`）
+- InfluxDB → [http://localhost:8086](http://localhost:8086)  （初期ユーザー: `admin` / `password`）
+
+Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシュボードがあります。
+起動後1日程度はデータ不足のため一部のパネルが`No data`と表示される場合があります。
+データが全く表示されない場合はダッシュボード左上のユーザー名が正しく選択されていることを確認してください。
+
+【注意】初回のコンテナ起動時はサービスが立ち上がるまで時間がかかる場合があります。アクセスできない場合は時間をおいて再度お試してください。
+
+## インストール方法（手動導入）
+
+### 前提条件
 
 - [Git](https://git-scm.com/)がインストールされていること
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) がインストールされていること
 
-## リポジトリの取得
+### リポジトリの取得
 
 ```bash
 git clone https://github.com/njm2360/dekapu-dashboard.git
 ```
 
-## 環境変数の設定
+### 環境変数の設定
 
 `.env.template` をコピーして `.env` を作成し、値を編集してください。
 
@@ -28,7 +58,6 @@ copy .env.template .env
 - VRCHAT_LOG_DIR: WindowsをCドライブ以外にインストールしている場合は変更してください。（基本的には変更不要です）
 
 ```dotenv
-# Python app
 USERNAME=user
 VRCHAT_LOG_DIR=/host_mnt/c/Users/${USERNAME}/AppData/LocalLow/VRChat/VRChat
 ```
@@ -38,30 +67,19 @@ VRCHAT_LOG_DIR=/host_mnt/c/Users/${USERNAME}/AppData/LocalLow/VRChat/VRChat
 
 `INFLUXDB_BUCKET`は変更しないでください。ダッシュボードが壊れます。
 
-## 起動方法
+### 起動方法
 
 ```bash
 docker compose up -d
 ```
 
-- 実行時に`no configuration file provided`と表示されて起動できない場合はディレクトリが移動できていません。`cd dekapu-dashboard`でディレクトリを移動してから実行してください。
-
-### 自動起動について
+#### 自動起動について
 
 Windows環境でDocker Desktopを使用している場合は、以下の設定にチェックを入れてください。
 
 Settings -> General -> Start Docker Desktop when you sign in to your computer
 
 この設定を有効にした上で、一度だけ`docker compose up -d` を実行しておけば、以降はWindows起動時にDocker Desktopとともにコンテナも自動起動します。**毎回起動コマンドを実行する必要はありません**。
-
-起動後:
-
-- Grafana → [http://localhost:3000](http://localhost:3000) （初期ユーザー: `admin` / `password`）
-- InfluxDB → [http://localhost:8086](http://localhost:8086)  （初期ユーザー: `admin` / `password`）
-
-Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシュボードがあります。
-起動後1日程度はデータ不足のため一部のパネルが`No data`と表示される場合があります。
-データが全く表示されない場合はダッシュボード左上のユーザー名が入力されていることを確認してください。
 
 ## 停止方法
 
