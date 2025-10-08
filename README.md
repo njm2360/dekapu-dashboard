@@ -32,6 +32,10 @@ Grafanaを開いてDashboard内に`でかプ実績`という名前のダッシ�
 
 ## インストール方法（手動導入）
 
+基本的に手動導入をする必要はありませんが必要に応じて手動導入をすることも可能です。
+
+より詳細な手順説明は[こちら](https://github.com/njm2360/dekapu-dashboard/blob/main/README-easy.md)にあります。
+
 ### 前提条件
 
 - [Git](https://git-scm.com/)がインストールされていること
@@ -52,14 +56,10 @@ cd dekapu-dashboard
 copy .env.template .env
 ```
 
-主に設定が必要なのは以下の設定です。
+設定が必要なのは以下の設定です。`{ユーザー名}`は実際のPCのユーザープロファイルパスの名前に合わせてください。
 
-- USERNAME: ご使用のPCのユーザー名に置き換えてください。(`C:/Users`以下のフォルダ名です)
-- VRCHAT_LOG_DIR: WindowsをCドライブ以外にインストールしている場合は変更してください。（基本的には変更不要です）
-
-```dotenv
-USERNAME=user
-VRCHAT_LOG_DIR=/host_mnt/c/Users/${USERNAME}/AppData/LocalLow/VRChat/VRChat
+```ini
+VRCHAT_LOG_DIR=/host_mnt/c/Users/{ユーザー名}/AppData/LocalLow/VRChat/VRChat
 ```
 
 またGrafanaやInfluxDBの初期ユーザー名やパスワード、トークンが記載されています。

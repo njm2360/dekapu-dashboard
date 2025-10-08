@@ -1,4 +1,4 @@
-# 導入のポイント
+# 手動導入のポイント
 
 ## はじめに
 
@@ -28,7 +28,7 @@ Windowsのアップデートも忘れずに行ってください
     3. 黒い画面が出てきたらOKです
 
 ターミナルでは現在の場所（カレントディレクトリ）が表示されています。
-ここが間違っていると正しく導入できないので注してください。普通に起動した場合はカレントディレクトリとして自分のユーザー名の直下にいると思います。（例: `C:\Users\10576>`）
+ここが間違っていると正しく導入できないので注してください。普通に起動した場合はカレントディレクトリとして自分のユーザー名の直下にいると思います。（例: `C:\Users\njm2360>`）
 ここが間違っていると誤った場所に導入してしまうので、もし違っている場合（管理者で起動した場合`C:\Windows\System32>`になっている場合があります）は`cd %homepath%`を実行してユーザーフォルダに移動してください。
 
 ## 導入方法
@@ -36,12 +36,14 @@ Windowsのアップデートも忘れずに行ってください
 1. Gitからリポジトリをクローンします
     正しいカレントディレクトリにいることを確認して以下のコマンドでクローンして下さい
 
-    `git clone https://github.com/njm2360/dekapu-dashboard.git`
+    ```bash
+    git clone https://github.com/njm2360/dekapu-dashboard.git
+    ```
 
     以下のような出力が出れば成功です
 
     ```bash
-    PS C:\Users\10576> git clone https://github.com/njm2360/dekapu-dashboard.git
+    PS C:\Users\njm2360> git clone https://github.com/njm2360/dekapu-dashboard.git
     Cloning into 'dekapu-dashboard'...
     remote: Enumerating objects: 175, done.
     remote: Counting objects: 100% (175/175), done.
@@ -53,11 +55,29 @@ Windowsのアップデートも忘れずに行ってください
 
 1. クローンしたリポジトリの中に移動します
 
-    `cd dekapu-dashboard`
+    ```bash
+    cd dekapu-dashboard
+    ```
 
 1. 環境変数を設定します
 
-    `(Get-Content .env.template) -replace '^USERNAME=.*', "USERNAME=$env:USERNAME" | Set-Content .env`
+    ```ps1(Get-Content ".env.template") |
+    ForEach-Object {
+        if ($_ -match '^VRCHAT_LOG_DIR=') {
+            $winPath = [Environment]::GetEnvironmentVariable('USERPROFILE')
+
+            $drive = $winPath.Substring(0,1).ToLower()
+
+            $converted = $winPath -replace '^[A-Za-z]:', "/host_mnt/$drive"
+            $converted = $converted -replace '\\', '/'
+
+            "VRCHAT_LOG_DIR=${converted}/AppData/LocalLow/VRChat/VRChat"
+        }
+        else {
+            $_
+        }
+    } | Set-Content ".env"
+    ```
 
 1. Dockerコンテナを起動します
 
@@ -66,7 +86,7 @@ Windowsのアップデートも忘れずに行ってください
     以下のような出力であれば正常です
 
     ```bash
-    PS C:\Users\10576\dekapu-dashboard> docker compose up -d
+    PS C:\Users\njm2360\dekapu-dashboard> docker compose up -d
     [+] Running 3/3
      ✔ Container influxdb    Running                                                                                                                                                                 0.0s
      ✔ Container grafana     Running                                                                                                                                                                 0.0s
