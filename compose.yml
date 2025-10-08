@@ -1,10 +1,9 @@
 services:
   influxdb:
     image: influxdb:2.7.12
-    container_name: influxdb
     restart: unless-stopped
     ports:
-      - "8086:8086"
+      - "127.0.0.1:8086:8086"
     volumes:
       - influxdb-data:/var/lib/influxdb2
       - influxdb-config:/etc/influxdb2
@@ -17,11 +16,10 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
 
   grafana:
-    image: grafana/grafana:12.1.1
-    container_name: grafana
+    image: grafana/grafana:12.2.0
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
@@ -35,7 +33,6 @@ services:
 
   log-parser:
     build: ./log-parser
-    container_name: log-parser
     restart: unless-stopped
     depends_on:
       - influxdb
