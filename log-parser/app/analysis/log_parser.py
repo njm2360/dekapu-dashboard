@@ -15,9 +15,8 @@ class MppLogParser:
     SAVEDATA_URL_PREFIX: Final[str] = "https://push.trap.games/api/v3/data"
     TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
     CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
-    JP_STOCK_OVER_MSG: Final[str] = (
-        "[JP] ストック溢れです！プレイヤーメダルに変換しました"
-    )
+    SESSION_RESET_MSG: Final[str] = "[ResetCurrentSession]"
+    JP_STOCK_OVER_MSG: Final[str] = "[JP] ストック溢れです"
     WORLD_JOIN_MSG: Final[str] = (
         "[Behaviour] Joining wrld_1af53798-92a3-4c3f-99ae-a7c42ec6084d"
     )
@@ -80,13 +79,23 @@ class MppLogParser:
                 self.medal_rate.reset()
                 return None
 
+            # セッションリセットの検出(パーク振り直し)
+            if self.SESSION_RESET_MSG in line:
+                logging.info(
+                    f"[{self.fname}] Session reset detected. Reset medal rate."
+                )
+                self.medal_rate.reset()
+                return None
+
             # JPストック溢れの検出
             if self.JP_STOCK_OVER_MSG in line:
                 self._parse_jp_stockover_line(line)
 
             # でかプへのJoin検出
             if self.WORLD_JOIN_MSG in line:
-                logging.info(f"[{self.fname}] Dekapu world join detected. Reset medal rate.")
+                logging.info(
+                    f"[{self.fname}] Dekapu world join detected. Reset medal rate."
+                )
                 self.medal_rate.reset()
                 return None
 
