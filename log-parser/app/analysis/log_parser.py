@@ -15,6 +15,11 @@ class MppLogParser:
     SAVEDATA_URL_PREFIX: Final[str] = "https://push.trap.games/api/v3/data"
     TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
     CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
+    SESSION_RESET_MSG: Final[str] = "[ResetCurrentSession]"
+    JP_STOCK_OVER_MSG: Final[str] = "[JP] ストック溢れです"
+    WORLD_JOIN_MSG: Final[str] = (
+        "[Behaviour] Joining wrld_1af53798-92a3-4c3f-99ae-a7c42ec6084d"
+    )
 
     TIMESTAMP_RE = re.compile(r"^(\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2})")
 
@@ -24,6 +29,7 @@ class MppLogParser:
         self.fname = fname
         self.medal_rate = MedalRateEMA()
         self.last_timestamp: Optional[datetime] = None
+        self.last_stockover: int = 0
 
         # TZ環境変数がない場合はAsia/Tokyoとして解釈する
         tz_name = os.getenv("TZ", self.DEFAULT_TZ)
@@ -47,6 +53,19 @@ class MppLogParser:
         except Exception as e:
             logging.warning(f"[{self.fname}] Failed to parse timestamp: {e}")
 
+    def _parse_jp_stockover_line(self, line: str):
+        m = re.search(r":\s*([\d,]+)$", line)
+        if not m:
+            return
+
+        try:
+            num_str = m.group(1)
+            stock = int(num_str.replace(",", ""))
+            self.last_stockover += stock
+            logging.debug(f"[{self.fname}] JP stockover added: {stock}")
+        except Exception as e:
+            logging.warning(f"[{self.fname}] Failed to parse JP stockover: {e}")
+
     def parse_line(self, line: str) -> Optional[Point]:
         try:
             # タイムスタンプ行の検出
@@ -60,54 +79,77 @@ class MppLogParser:
                 self.medal_rate.reset()
                 return None
 
+            # セッションリセットの検出(パーク振り直し)
+            if self.SESSION_RESET_MSG in line:
+                logging.info(
+                    f"[{self.fname}] Session reset detected. Reset medal rate."
+                )
+                self.medal_rate.reset()
+                return None
+
+            # JPストック溢れの検出
+            if self.JP_STOCK_OVER_MSG in line:
+                self._parse_jp_stockover_line(line)
+
+            # でかプへのJoin検出
+            if self.WORLD_JOIN_MSG in line:
+                logging.info(
+                    f"[{self.fname}] Dekapu world join detected. Reset medal rate."
+                )
+                self.medal_rate.reset()
+                return None
+
             # セーブデータ行の検出
-            if self.SAVEDATA_URL_PREFIX not in line:
-                return None
+            if self.SAVEDATA_URL_PREFIX in line:
+                parsed = urlparse(line)
+                query = parse_qs(parsed.query)
+                raw_data = unquote(query.get("data", ["{}"])[0])
 
-            parsed = urlparse(line)
-            query = parse_qs(parsed.query)
-            raw_data = unquote(query.get("data", ["{}"])[0])
+                try:
+                    data: dict[str, any] = json.loads(raw_data)
+                except json.JSONDecodeError as e:
+                    logging.warning(f"[{self.fname}] JSON decode error: {e}")
+                    return None
 
-            try:
-                data: dict[str, any] = json.loads(raw_data)
-            except json.JSONDecodeError as e:
-                logging.warning(f"[{self.fname}] JSON decode error: {e}")
-                return None
+                user_id = query.get("user_id", [""])[0]
+                credit_all = data.get("credit_all")
 
-            user_id = query.get("user_id", [""])[0]
-            credit_all = data.get("credit_all")
+                # タイムスタンプが未取得の場合、現在時刻で書き込む
+                timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
+                if not self.last_timestamp:
+                    logging.warning(
+                        f"[{self.fname}] No timestamp captured, fallback to now()"
+                    )
 
-            # タイムスタンプが未取得の場合、現在時刻で書き込む
-            timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
-            if not self.last_timestamp:
-                logging.warning(
-                    f"[{self.fname}] No timestamp captured, fallback to now()"
+                p = (
+                    Point("mpp-savedata")
+                    .tag("user", user_id)
+                    .time(timestamp, WritePrecision.NS)
                 )
 
-            p = (
-                Point("mpp-savedata")
-                .tag("user", user_id)
-                .time(timestamp, WritePrecision.NS)
-            )
+                for k, v in data.items():
+                    if isinstance(v, (int, float, str)):
+                        if isinstance(v, int):
+                            v = self.fix_overflow(v, 32)
+                        p = p.field(k, v)
+                    elif isinstance(v, dict) and k.startswith("dc_"):
+                        for sub_k, sub_v in v.items():
+                            if isinstance(sub_v, (int, float, str)):
+                                if isinstance(sub_v, int):
+                                    sub_v = self.fix_overflow(sub_v, 32)
+                                p = p.field(f"{k}_{sub_k}", sub_v)
 
-            for k, v in data.items():
-                if isinstance(v, (int, float, str)):
-                    if isinstance(v, int):
-                        v = self.fix_overflow(v, 32)
-                    p = p.field(k, v)
-                elif isinstance(v, dict) and k.startswith("dc_"):
-                    for sub_k, sub_v in v.items():
-                        if isinstance(sub_v, (int, float, str)):
-                            if isinstance(sub_v, int):
-                                sub_v = self.fix_overflow(sub_v, 32)
-                            p = p.field(f"{k}_{sub_k}", sub_v)
+                if credit_all is not None:
+                    # ストック溢れ分を差し引いて増加量を計算
+                    adjusted_credit = credit_all - self.last_stockover
+                    delta = self.medal_rate.update(adjusted_credit, timestamp)
+                    if delta is not None:
+                        p = p.field("credit_all_delta_1m", delta)
+                        logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
 
-            if credit_all is not None:
-                delta = self.medal_rate.update(credit_all, timestamp)
-                if delta is not None:
-                    p = p.field("credit_all_delta_1m", delta)
+                return p
 
-            return p
+            return None
 
         except UnicodeDecodeError as e:
             logging.error(f"[{self.fname}] Encoding error in line: {e}")
