@@ -115,7 +115,22 @@ if (-not (Test-Path $dir)) {
 cd $dir
 
 # Set environment
-(Get-Content ".env.template") -replace '^USERNAME=.*', "USERNAME=$env:USERNAME" | Set-Content ".env"
+(Get-Content ".env.template") |
+ForEach-Object {
+    if ($_ -match '^VRCHAT_LOG_DIR=') {
+        $winPath = [Environment]::GetEnvironmentVariable('USERPROFILE')
+
+        $drive = $winPath.Substring(0,1).ToLower()
+
+        $converted = $winPath -replace '^[A-Za-z]:', "/host_mnt/$drive"
+        $converted = $converted -replace '\\', '/'
+
+        "VRCHAT_LOG_DIR=${converted}/AppData/LocalLow/VRChat/VRChat"
+    }
+    else {
+        $_
+    }
+} | Set-Content ".env"
 
 # Docker paths
 $dockerBin = "$env:ProgramFiles\Docker\Docker\resources\bin"
