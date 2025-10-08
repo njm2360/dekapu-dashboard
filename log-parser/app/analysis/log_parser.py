@@ -18,6 +18,9 @@ class MppLogParser:
     JP_STOCK_OVER_MSG: Final[str] = (
         "[JP] ストック溢れです！プレイヤーメダルに変換しました"
     )
+    WORLD_JOIN_MSG: Final[str] = (
+        "[Behaviour] Joining wrld_1af53798-92a3-4c3f-99ae-a7c42ec6084d"
+    )
 
     TIMESTAMP_RE = re.compile(r"^(\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2})")
 
@@ -80,6 +83,12 @@ class MppLogParser:
             # JPストック溢れの検出
             if self.JP_STOCK_OVER_MSG in line:
                 self._parse_jp_stockover_line(line)
+
+            # でかプへのJoin検出
+            if self.WORLD_JOIN_MSG in line:
+                logging.info(f"[{self.fname}] Dekapu world join detected. Reset medal rate.")
+                self.medal_rate.reset()
+                return None
 
             # セーブデータ行の検出
             if self.SAVEDATA_URL_PREFIX in line:
