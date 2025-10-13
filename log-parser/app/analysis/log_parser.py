@@ -138,6 +138,10 @@ class MppLogParser:
                                 if isinstance(sub_v, int):
                                     sub_v = self.fix_overflow(sub_v, 32)
                                 p = p.field(f"{k}_{sub_k}", sub_v)
+                    elif isinstance(v, list) and k.startswith("l_totems_set"):
+                        for i, item in enumerate(v, start=1):
+                            if isinstance(item, int):
+                                p = p.field(f"{k}_{i}", item)
 
                 if credit_all is not None:
                     # ストック溢れ分を差し引いて増加量を計算
