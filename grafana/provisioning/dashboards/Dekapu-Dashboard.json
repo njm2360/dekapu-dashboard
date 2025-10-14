@@ -171,7 +171,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 10,
+        "w": 9,
         "x": 6,
         "y": 1
       },
@@ -265,8 +265,8 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 8,
-        "x": 16,
+        "w": 9,
+        "x": 15,
         "y": 1
       },
       "id": 5,
@@ -463,7 +463,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 10,
+        "w": 9,
         "x": 6,
         "y": 8
       },
@@ -536,8 +536,8 @@
       },
       "gridPos": {
         "h": 14,
-        "w": 8,
-        "x": 16,
+        "w": 9,
+        "x": 15,
         "y": 8
       },
       "id": 24,
@@ -556,7 +556,7 @@
       "pluginVersion": "2.0.1",
       "targets": [
         {
-          "query": "import \"date\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -7d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      time: r._time,\r\n      value: r._value,\r\n  }))\r\n",
+          "query": "import \"date\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      time: r._time,\r\n      value: r._value,\r\n  }))\r\n",
           "refId": "A"
         }
       ],
@@ -1035,46 +1035,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 50,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "displayName": "スキルメダル獲得数",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1085,39 +1047,43 @@
               }
             ]
           },
-          "unit": "sishort"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
+        "h": 3,
+        "w": 3,
         "x": 12,
         "y": 16
       },
-      "id": 32,
+      "id": 74,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_7\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"l_achieve_count\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "スキルメダル獲得数",
-      "type": "timeseries"
+      "title": "実績獲得数",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -3154,6 +3120,226 @@
         "x": 0,
         "y": 50
       },
+      "id": 73,
+      "panels": [],
+      "title": "トーテム",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 51
+      },
+      "id": 72,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^l_totems_set_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"l_totems_set_1\" then \"祭壇1\"\r\n        else if r._field == \"l_totems_set_2\" then \"祭壇2\"\r\n        else if r._field == \"l_totems_set_3\" then \"祭壇3\"\r\n        else if r._field == \"l_totems_set_4\" then \"祭壇4\"\r\n        else if r._field == \"l_totems_set_5\" then \"祭壇5\"\r\n        else r._field,\r\n      _value:\r\n        if r._value == 0 then \"なし\"\r\n        else if r._value == 1 then \"橙\"\r\n        else if r._value == 2 then \"緑\"\r\n        else if r._value == 4 then \"ピンク\"\r\n        else if r._value == 5 then \"紫\"\r\n        else if r._value == 6 then \"白\"\r\n        else if r._value == 7 then \"水色\"\r\n        else if r._value == 8 then \"灰桜\"\r\n        else if r._value == 9 then \"群青\"\r\n        else if r._value == 10 then \"赤\"\r\n        else if r._value == 11 then \"クリーム\"\r\n        else if r._value == 12 then \"ミント\"\r\n        else if r._value == 13 then \"ピーチ\"\r\n        else if r._value == 14 then \"星空\"\r\n        else if r._value == 15 then \"草原\"\r\n        else if r._value == 16 then \"黒\"\r\n        else string(v: r._value)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "トーテム設置",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "なし": {
+                  "color": "#88818100",
+                  "index": 15
+                },
+                "クリーム": {
+                  "color": "#fffbd0",
+                  "index": 9
+                },
+                "ピンク": {
+                  "color": "#ffa3ff",
+                  "index": 2
+                },
+                "ピーチ": {
+                  "color": "#ff5aa3",
+                  "index": 11
+                },
+                "ミント": {
+                  "color": "#c8ffef",
+                  "index": 10
+                },
+                "星空": {
+                  "color": "#0d1640",
+                  "index": 12
+                },
+                "橙": {
+                  "color": "#ffbf22",
+                  "index": 0
+                },
+                "水色": {
+                  "color": "#62f5ff",
+                  "index": 5
+                },
+                "灰桜": {
+                  "color": "#c09999",
+                  "index": 6
+                },
+                "白": {
+                  "color": "#ffffff",
+                  "index": 4
+                },
+                "紫": {
+                  "color": "#5b2072",
+                  "index": 3
+                },
+                "緑": {
+                  "color": "#67c077",
+                  "index": 1
+                },
+                "群青": {
+                  "color": "#2e487f",
+                  "index": 7
+                },
+                "草原": {
+                  "color": "#f2ffd7",
+                  "index": 13
+                },
+                "赤": {
+                  "color": "#f97f64",
+                  "index": 8
+                },
+                "黒": {
+                  "color": "#000000",
+                  "index": 14
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 16,
+        "x": 8,
+        "y": 51
+      },
+      "id": 71,
+      "options": {
+        "alignValue": "right",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "mergeValues": true,
+        "rowHeight": 0.89,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^l_totems_set_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"l_totems_set_1\" then \"祭壇1\"\r\n        else if r._field == \"l_totems_set_2\" then \"祭壇2\"\r\n        else if r._field == \"l_totems_set_3\" then \"祭壇3\"\r\n        else if r._field == \"l_totems_set_4\" then \"祭壇4\"\r\n        else if r._field == \"l_totems_set_5\" then \"祭壇5\"\r\n        else r._field,\r\n      _value:\r\n        if r._value == 0 then \"なし\"\r\n        else if r._value == 1 then \"橙\"\r\n        else if r._value == 2 then \"緑\"\r\n        else if r._value == 4 then \"ピンク\"\r\n        else if r._value == 5 then \"紫\"\r\n        else if r._value == 6 then \"白\"\r\n        else if r._value == 7 then \"水色\"\r\n        else if r._value == 8 then \"灰桜\"\r\n        else if r._value == 9 then \"群青\"\r\n        else if r._value == 10 then \"赤\"\r\n        else if r._value == 11 then \"クリーム\"\r\n        else if r._value == 12 then \"ミント\"\r\n        else if r._value == 13 then \"ピーチ\"\r\n        else if r._value == 14 then \"星空\"\r\n        else if r._value == 15 then \"草原\"\r\n        else if r._value == 16 then \"黒\"\r\n        else string(v: r._value)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "トーテム設置履歴",
+      "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 57
+      },
       "id": 40,
       "panels": [],
       "title": "ボール",
@@ -3187,7 +3373,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 51
+        "y": 58
       },
       "id": 9,
       "options": {
@@ -3270,7 +3456,7 @@
         "h": 10,
         "w": 10,
         "x": 4,
-        "y": 51
+        "y": 58
       },
       "id": 44,
       "options": {
@@ -3298,7 +3484,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_90\" then \"没シャルベ\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
           "refId": "A"
         }
       ],
@@ -3356,7 +3542,7 @@
         "h": 10,
         "w": 10,
         "x": 14,
-        "y": 51
+        "y": 58
       },
       "id": 42,
       "options": {
@@ -3385,7 +3571,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n  \r\n",
+          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_90\" then \"没シャルベ\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n  \r\n",
           "refId": "A"
         }
       ],
@@ -3420,7 +3606,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 54
+        "y": 61
       },
       "id": 52,
       "options": {
@@ -3516,7 +3702,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 57
+        "y": 64
       },
       "id": 33,
       "options": {
@@ -3570,7 +3756,7 @@
         "h": 7,
         "w": 10,
         "x": 4,
-        "y": 61
+        "y": 68
       },
       "id": 47,
       "options": {
@@ -3596,7 +3782,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_get_90\" then \"没シャルベ\"\r\n          else if r._field == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
           "refId": "A"
         }
       ],
@@ -3636,7 +3822,7 @@
         "h": 14,
         "w": 10,
         "x": 14,
-        "y": 61
+        "y": 68
       },
       "id": 59,
       "options": {
@@ -3659,7 +3845,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"timezone\"\r\nimport \"strings\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nball = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"ball_get\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\nballs = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field =~ /^dc_ball_get_/ and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\njoin(\r\n  tables: {balls: balls, ball: ball},\r\n  on: [\"_time\"],\r\n)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: if r._value_ball == 0.0 then 0.0 else float(v: r._value_balls) / float(v: r._value_ball) * 100.0\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field_balls\", \"_value\"])\r\n  |> difference(nonNegative: false, columns: [\"_value\"])\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field_balls:\r\n          if r._field_balls == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field_balls == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field_balls == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field_balls == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field_balls == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field_balls == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field_balls == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field_balls == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field_balls == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field_balls == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field_balls == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field_balls == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field_balls == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field_balls == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field_balls == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field_balls == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field_balls == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field_balls == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field_balls == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field_balls == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field_balls == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field_balls == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field_balls == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field_balls, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n",
+          "query": "import \"timezone\"\r\nimport \"strings\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nball = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"ball_get\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\nballs = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field =~ /^dc_ball_get_/ and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: 9h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\njoin(\r\n  tables: {balls: balls, ball: ball},\r\n  on: [\"_time\"],\r\n)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: if r._value_ball == 0.0 then 0.0 else float(v: r._value_balls) / float(v: r._value_ball) * 100.0\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field_balls\", \"_value\"])\r\n  |> difference(nonNegative: false, columns: [\"_value\"])\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field_balls:\r\n          if r._field_balls == \"dc_ball_get_0\" then \"ノーマル\"\r\n          else if r._field_balls == \"dc_ball_get_1\" then \"橙\"\r\n          else if r._field_balls == \"dc_ball_get_2\" then \"緑\"\r\n          else if r._field_balls == \"dc_ball_get_3\" then \"虹\"\r\n          else if r._field_balls == \"dc_ball_get_4\" then \"ピンク\"\r\n          else if r._field_balls == \"dc_ball_get_5\" then \"紫\"\r\n          else if r._field_balls == \"dc_ball_get_6\" then \"白\"\r\n          else if r._field_balls == \"dc_ball_get_7\" then \"水色\"\r\n          else if r._field_balls == \"dc_ball_get_8\" then \"灰桜\"\r\n          else if r._field_balls == \"dc_ball_get_9\" then \"群青\"\r\n          else if r._field_balls == \"dc_ball_get_10\" then \"赤\"\r\n          else if r._field_balls == \"dc_ball_get_11\" then \"クリーム\"\r\n          else if r._field_balls == \"dc_ball_get_12\" then \"ミント\"\r\n          else if r._field_balls == \"dc_ball_get_13\" then \"ピーチ\"\r\n          else if r._field_balls == \"dc_ball_get_14\" then \"星空\"\r\n          else if r._field_balls == \"dc_ball_get_15\" then \"草原\"\r\n          else if r._field_balls == \"dc_ball_get_16\" then \"黒\"\r\n          else if r._field_balls == \"dc_ball_get_90\" then \"没シャルベ\"\r\n          else if r._field_balls == \"dc_ball_get_100\" then \"ゴールデン\"\r\n          else if r._field_balls == \"dc_ball_get_101\" then \"アメジスト\"\r\n          else if r._field_balls == \"dc_ball_get_102\" then \"エメラルド\"\r\n          else if r._field_balls == \"dc_ball_get_103\" then \"ローズクォーツ\"\r\n          else if r._field_balls == \"dc_ball_get_334\" then \"抽選\"\r\n          else if r._field_balls == \"dc_ball_get_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field_balls, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n",
           "refId": "A"
         }
       ],
@@ -3694,7 +3880,7 @@
         "h": 7,
         "w": 10,
         "x": 4,
-        "y": 68
+        "y": 75
       },
       "id": 48,
       "options": {
@@ -3720,7 +3906,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_chain_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_chain_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_chain_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_chain_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_chain_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_chain_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_chain_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_chain_6\" then \"白\"\r\n          else if r._field == \"dc_ball_chain_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_chain_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_chain_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_chain_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_chain_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_chain_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_chain_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_chain_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_chain_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_chain_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_chain_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_chain_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_chain_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_chain_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_chain_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_chain_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_chain_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_chain_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_chain_0\" then \"ノーマル\"\r\n          else if r._field == \"dc_ball_chain_1\" then \"橙\"\r\n          else if r._field == \"dc_ball_chain_2\" then \"緑\"\r\n          else if r._field == \"dc_ball_chain_3\" then \"虹\"\r\n          else if r._field == \"dc_ball_chain_4\" then \"ピンク\"\r\n          else if r._field == \"dc_ball_chain_5\" then \"紫\"\r\n          else if r._field == \"dc_ball_chain_6\" then \"白\"\r\n          else if r._field == \"dc_ball_chain_7\" then \"水色\"\r\n          else if r._field == \"dc_ball_chain_8\" then \"灰桜\"\r\n          else if r._field == \"dc_ball_chain_9\" then \"群青\"\r\n          else if r._field == \"dc_ball_chain_10\" then \"赤\"\r\n          else if r._field == \"dc_ball_chain_11\" then \"クリーム\"\r\n          else if r._field == \"dc_ball_chain_12\" then \"ミント\"\r\n          else if r._field == \"dc_ball_chain_13\" then \"ピーチ\"\r\n          else if r._field == \"dc_ball_chain_14\" then \"星空\"\r\n          else if r._field == \"dc_ball_chain_15\" then \"草原\"\r\n          else if r._field == \"dc_ball_chain_16\" then \"黒\"\r\n          else if r._field == \"dc_ball_chain_90\" then \"没シャルベ\"\r\n          else if r._field == \"dc_ball_chain_100\" then \"ゴールデン\"\r\n          else if r._field == \"dc_ball_chain_101\" then \"アメジスト\"\r\n          else if r._field == \"dc_ball_chain_102\" then \"エメラルド\"\r\n          else if r._field == \"dc_ball_chain_103\" then \"ローズクォーツ\"\r\n          else if r._field == \"dc_ball_chain_334\" then \"抽選\"\r\n          else if r._field == \"dc_ball_chain_335\" then \"抽選（特殊効果）\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_chain_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
           "refId": "A"
         }
       ],
@@ -3733,7 +3919,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 75
+        "y": 82
       },
       "id": 37,
       "panels": [],
@@ -3768,7 +3954,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 76
+        "y": 83
       },
       "id": 8,
       "options": {
@@ -3847,7 +4033,7 @@
         "h": 10,
         "w": 10,
         "x": 4,
-        "y": 76
+        "y": 83
       },
       "id": 34,
       "options": {
@@ -3876,7 +4062,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"棒金メダルx10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_19\" then \"クソデカ金メダルx10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"クソデカ金メダルx100\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
           "refId": "A"
         }
       ],
@@ -3936,7 +4122,7 @@
         "h": 10,
         "w": 10,
         "x": 14,
-        "y": 76
+        "y": 83
       },
       "id": 35,
       "options": {
@@ -3965,7 +4151,7 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n",
+          "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"棒金メダルx10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_19\" then \"クソデカ金メダルx10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"クソデカ金メダルx100\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n",
           "refId": "A"
         }
       ],
@@ -4000,7 +4186,7 @@
         "h": 3,
         "w": 4,
         "x": 0,
-        "y": 79
+        "y": 86
       },
       "id": 6,
       "options": {
@@ -4084,7 +4270,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 82
+        "y": 89
       },
       "id": 58,
       "options": {
@@ -4184,9 +4370,9 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 10,
+        "w": 7,
         "x": 4,
-        "y": 86
+        "y": 93
       },
       "id": 70,
       "options": {
@@ -4238,9 +4424,9 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 10,
-        "x": 14,
-        "y": 86
+        "w": 13,
+        "x": 11,
+        "y": 93
       },
       "id": 49,
       "options": {
@@ -4266,12 +4452,104 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"デカ金メダル\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n          else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"ノーマル\"\r\n        else if r._field == \"dc_medal_get_1\" then \"橙(ルーレット)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"緑\"\r\n        else if r._field == \"dc_medal_get_3\" then \"ピンク\"\r\n        else if r._field == \"dc_medal_get_4\" then \"紫\"\r\n        else if r._field == \"dc_medal_get_5\" then \"水色\"\r\n        else if r._field == \"dc_medal_get_6\" then \"壁メダル\"\r\n        else if r._field == \"dc_medal_get_7\" then \"スキルメダル\"\r\n        else if r._field == \"dc_medal_get_12\" then \"緑10倍\"\r\n        else if r._field == \"dc_medal_get_13\" then \"赤10倍\"\r\n        else if r._field == \"dc_medal_get_14\" then \"紫10倍\"\r\n        else if r._field == \"dc_medal_get_15\" then \"ゴールデンメダル\"\r\n        else if r._field == \"dc_medal_get_16\" then \"棒金メダル\"\r\n        else if r._field == \"dc_medal_get_17\" then \"棒金メダルx10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"クソデカ金メダル\"\r\n        else if r._field == \"dc_medal_get_19\" then \"クソデカ金メダルx10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"クソデカ金メダルx100\"\r\n        else if r._field == \"dc_medal_get_100\" then \"虹メダル\"\r\n        else if r._field == \"dc_medal_get_101\" then \"金メダル(ボツ枠)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"サファイア\"\r\n        else if r._field == \"dc_medal_get_103\" then \"ルビー\"\r\n        else if r._field == \"dc_medal_get_104\" then \"エメラルド\"\r\n        else if r._field == \"dc_medal_get_105\" then \"ダイヤモンド\"\r\n          else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
           "refId": "A"
         }
       ],
       "title": "累計メダル獲得数",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "displayName": "スキルメダル獲得数",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "sishort"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 0,
+        "y": 96
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.0",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_7\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
+          "refId": "A"
+        }
+      ],
+      "title": "スキルメダル獲得数",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -4315,5 +4593,5 @@
   "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 65
+  "version": 69
 }
