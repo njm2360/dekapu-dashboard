@@ -113,6 +113,7 @@ class MppLogParser:
 
                 user_id = query.get("user_id", [""])[0]
                 credit_all = data.get("credit_all")
+                l_achieve_count = len(data.get("l_achieve", []))
 
                 # タイムスタンプが未取得の場合、現在時刻で書き込む
                 timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
@@ -125,6 +126,7 @@ class MppLogParser:
                     Point("mpp-savedata")
                     .tag("user", user_id)
                     .time(timestamp, WritePrecision.NS)
+                    .field("l_achieve_count", l_achieve_count)
                 )
 
                 for k, v in data.items():
@@ -138,6 +140,10 @@ class MppLogParser:
                                 if isinstance(sub_v, int):
                                     sub_v = self.fix_overflow(sub_v, 32)
                                 p = p.field(f"{k}_{sub_k}", sub_v)
+                    elif isinstance(v, list) and k.startswith("l_totems_set"):
+                        for i, item in enumerate(v, start=1):
+                            if isinstance(item, int):
+                                p = p.field(f"{k}_{i}", item)
 
                 if credit_all is not None:
                     # ストック溢れ分を差し引いて増加量を計算
