@@ -12,26 +12,27 @@ from app.utils.influxdb import InfluxWriterAsync
 
 
 class VRChatLogWatcher:
-    def __init__(self, log_dir: Path, influx: InfluxWriterAsync):
+    def __init__(self, log_dir: Path, data_dir: Path, influx: InfluxWriterAsync):
         self.log_dir = log_dir
         self.influx = influx
         self.parsers: dict[str, MppLogParser] = {}
-        self.offset_store = FileOffsetStore(Path("data") / "offsets.json")
+        self.offset_store = FileOffsetStore(path=data_dir / "offsets.json")
 
         logging.info(f"[Watcher] Initialized. Log directory={log_dir}")
 
     async def _cleanup_offsets(self):
-        logging.info(f"[Watcher] Cleamup stale offset entrys")
+        logging.info("[Watcher] Cleanup stale offset entries")
         existing_files = {f.name for f in self.log_dir.glob("output_log_*.txt")}
-        for fname in list(self.offset_store.all().keys()):
-            if fname not in existing_files:
-                logging.info(f"[Watcher] Removing stale offset entry: {fname}")
-                self.offset_store.remove(fname)
+
+        offsets = await self.offset_store.all()
+        for fname in set(offsets) - existing_files:
+            logging.info(f"[Watcher] Removing stale offset entry: {fname}")
+            await self.offset_store.remove(fname)
 
     async def watch_file(self, log_file: Path):
         fname = log_file.name
         parser = self.parsers.setdefault(fname, MppLogParser(fname))
-        offset = self.offset_store.get(fname)
+        offset = await self.offset_store.get(fname)
 
         logging.info(f"[Watcher] Start watching file={fname}, offset={offset}")
 
@@ -63,12 +64,12 @@ class VRChatLogWatcher:
                         # 1時間更新がなければ監視を終了
                         if datetime.now() - last_activity > timedelta(hours=1):
                             logging.info(f"[Watcher] Stop watching {fname}")
-                            self.offset_store.remove(fname)
+                            await self.offset_store.remove(fname)
                             break
                         continue
 
                     # オフセット更新
-                    self.offset_store.set(fname, f.tell())
+                    await self.offset_store.set(fname, f.tell())
                     last_activity = datetime.now()
 
                     record = parser.parse_line(line.strip())
@@ -134,4 +135,4 @@ class VRChatLogWatcher:
 
         finally:
             await self._cleanup_offsets()
-            self.offset_store.save()
+            await self.offset_store.flush()
