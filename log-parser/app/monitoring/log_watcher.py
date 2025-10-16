@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 from aiohttp import ClientConnectorError
+from influxdb_client import Point, WritePrecision
 
 from app.analysis.log_parser import MppLogParser
 from app.utils.offset_store import FileOffsetStore
@@ -70,27 +71,39 @@ class VRChatLogWatcher:
                     self.offset_store.set(fname, f.tell())
                     last_activity = datetime.now()
 
-                    point = parser.parse_line(line.strip())
+                    record = parser.parse_line(line.strip())
 
-                    # InfluxDBに書込
-                    if point:
-                        try:
-                            await self.influx.write(point)
-                            logging.debug(f"[Watcher] Data write OK ({fname})")
-                        except ClientConnectorError as e:
-                            logging.error(f"[Watcher] InfluxDB connect error: {e}")
-                            await asyncio.sleep(5)
-                            continue
-                        except asyncio.TimeoutError:
-                            logging.error(f"[Watcher] InfluxDB write timeout ({fname})")
-                            await asyncio.sleep(5)
-                            continue
-                        except OSError as e:
-                            logging.error(
-                                f"[Watcher] InfluxDB write failed ({fname}): {e}"
-                            )
-                            await asyncio.sleep(5)
-                            continue
+                    if not record:
+                        continue
+
+                    point = (
+                        Point("mpp-savedata")
+                        .tag("user", record.user_id)
+                        .time(record.timestamp, WritePrecision.NS)
+                        .field("l_achieve_count", len(record.data.l_achieve or []))
+                    )
+
+                    if record.credit_all_delta_1m is not None:
+                        point = point.field("credit_all_delta_1m", record.credit_all_delta_1m)
+
+                    for k, v in record.data.model_dump_for_influx().items():
+                        point = point.field(k, v)
+
+                    try:
+                        await self.influx.write(point)
+                        logging.debug(f"[Watcher] Data write OK ({fname})")
+                    except ClientConnectorError as e:
+                        logging.error(f"[Watcher] InfluxDB connect error: {e}")
+                        await asyncio.sleep(5)
+                        continue
+                    except asyncio.TimeoutError:
+                        logging.error(f"[Watcher] InfluxDB write timeout ({fname})")
+                        await asyncio.sleep(5)
+                        continue
+                    except OSError as e:
+                        logging.error(f"[Watcher] InfluxDB write failed ({fname}): {e}")
+                        await asyncio.sleep(5)
+                        continue
 
         except FileNotFoundError:
             logging.error(f"[Watcher] File not found: {fname}")
