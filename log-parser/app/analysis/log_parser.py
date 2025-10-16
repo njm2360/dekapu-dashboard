@@ -6,11 +6,10 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Final, Optional
 from pydantic import ValidationError
-from influxdb_client import Point, WritePrecision
 from urllib.parse import urlparse, parse_qs, unquote
 
 from app.analysis.medal_rate_ema import MedalRateEMA
-from app.model.mmp_savedata import MmpSaveData
+from app.model.mmp_savedata import MmpSaveData, MmpSaveRecord
 
 
 class MppLogParser:
@@ -70,7 +69,7 @@ class MppLogParser:
         except Exception as e:
             logging.warning(f"[{self.fname}] Failed to parse JP stockover: {e}")
 
-    def parse_line(self, line: str) -> Optional[Point]:
+    def parse_line(self, line: str) -> Optional[MmpSaveRecord]:
         try:
             # タイムスタンプ行の検出
             if self.TIMESTAMP_PREFIX in line:
@@ -94,6 +93,7 @@ class MppLogParser:
             # JPストック溢れの検出
             if self.JP_STOCK_OVER_MSG in line:
                 self._parse_jp_stockover_line(line)
+                return None
 
             # でかプへのJoin検出
             if self.WORLD_JOIN_MSG in line:
@@ -110,14 +110,14 @@ class MppLogParser:
 
                 data_param = query.get("data")
                 if not data_param or not data_param[0].strip():
-                    logging.warning(f"[{self.fname}] Missing 'data' parameter")
+                    logging.warning(f"[{self.fname}] Missing data parameter")
                     return None
 
                 raw_data = unquote(data_param[0])
 
                 user_id_list = query.get("user_id")
                 if not user_id_list or not user_id_list[0]:
-                    logging.warning(f"[{self.fname}] Missing user_id in query")
+                    logging.warning(f"[{self.fname}] Missing user_id parameter")
                     return None
 
                 user_id = user_id_list[0]
@@ -132,32 +132,29 @@ class MppLogParser:
                     logging.warning(f"[{self.fname}] JSON decode error: {e}")
                     return None
 
-                # タイムスタンプが未取得の場合、現在時刻で書き込む
+                # タイムスタンプが未取得の場合は現在時刻とする
+                # Memo: データ内のlastsaveがセーブURL生成時刻かも?
                 timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
                 if not self.last_timestamp:
                     logging.warning(
                         f"[{self.fname}] No timestamp captured, fallback to now()"
                     )
 
-                p = (
-                    Point("mpp-savedata")
-                    .tag("user", user_id)
-                    .time(timestamp, WritePrecision.NS)
-                    .field("l_achieve_count", len(data.l_achieve or []))
-                )
-
-                for k, v in data.model_dump_for_influx().items():
-                    p = p.field(k, v)
-
+                credit_all_delta_1m = None
                 if data.credit_all is not None:
                     # ストック溢れ分を差し引いて増加量を計算
                     adjusted_credit = data.credit_all - self.last_stockover
                     delta = self.medal_rate.update(adjusted_credit, timestamp)
                     if delta is not None:
-                        p = p.field("credit_all_delta_1m", delta)
+                        credit_all_delta_1m = delta
                         logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
 
-                return p
+                return MmpSaveRecord(
+                    user_id=user_id,
+                    timestamp=timestamp,
+                    credit_all_delta_1m=credit_all_delta_1m,
+                    data=data,
+                )
 
             return None
 

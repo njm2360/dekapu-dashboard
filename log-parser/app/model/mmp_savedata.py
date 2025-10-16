@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Dict, List
 from pydantic import BaseModel, ConfigDict
 
@@ -89,3 +90,10 @@ class MmpSaveData(BaseModel):
                     flat[f"{k}_{i}"] = item
 
         return flat
+
+
+class MmpSaveRecord(BaseModel):
+    user_id: str  # ユーザー名
+    timestamp: datetime  # タイムスタンプ
+    credit_all_delta_1m: Optional[int]  # 1分当たりの獲得速度
+    data: MmpSaveData
