@@ -14,7 +14,9 @@ from app.model.mmp_savedata import MmpSaveData
 
 
 class MppLogParser:
-    SAVEDATA_URL_PREFIX: Final[str] = "https://push.trap.games/api/v3/data"
+    SAVEDATA_URL_PATTERN: Final[re.Pattern] = re.compile(
+        r"https://push\.trap\.games/api/v\d+/data"
+    )
     TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
     CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
     SESSION_RESET_MSG: Final[str] = "[ResetCurrentSession]"
@@ -102,7 +104,7 @@ class MppLogParser:
                 return None
 
             # セーブデータ行の検出
-            if self.SAVEDATA_URL_PREFIX in line:
+            if self.SAVEDATA_URL_PATTERN.search(line):
                 parsed = urlparse(line)
                 query = parse_qs(parsed.query)
 
