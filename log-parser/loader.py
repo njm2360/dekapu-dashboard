@@ -65,6 +65,22 @@ def confirm_settings(start_dt: datetime, end_dt: datetime):
             print("無効な入力です。Y または n を入力してください。")
 
 
+def collect_unique_txt_files(
+    log_dir: Path, keep_duplicates: bool = False
+) -> list[Path]:
+    if keep_duplicates:
+        files = [f for f in log_dir.rglob("*.txt") if f.is_file()]
+        return sorted(files, key=lambda x: x.name)
+
+    found = {}
+    for f in log_dir.rglob("*.txt"):
+        if f.is_file():
+            name = f.name
+            if name not in found:
+                found[name] = f
+    return [found[k] for k in sorted(found.keys())]
+
+
 async def load_logs(
     log_dir: Path,
     influx: InfluxWriterAsync,
@@ -73,7 +89,7 @@ async def load_logs(
 ):
     logging.info(f"[Loader] Start loading logs from {log_dir}")
 
-    files = sorted(f for f in log_dir.glob("output_log_*.txt") if f.is_file())
+    files = collect_unique_txt_files(log_dir=log_dir)
     if not files:
         logging.warning(f"[Loader] No log files found in {log_dir}")
         return
