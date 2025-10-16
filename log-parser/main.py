@@ -1,29 +1,31 @@
+from dotenv import load_dotenv
+from app.utils.logger import setup_logger
+
+load_dotenv(override=True)
+setup_logger()
+
 import os
 import sys
 import signal
 import asyncio
 import logging
 from pathlib import Path
-from dotenv import load_dotenv
 
 from app.monitoring.log_watcher import VRChatLogWatcher
 from app.utils.influxdb import InfluxWriterAsync
-from app.utils.logger import setup_logger
-
-
-load_dotenv(override=True)
-setup_logger()
 
 
 async def main():
     influx = InfluxWriterAsync(
-        os.getenv("INFLUXDB_URL"),
-        os.getenv("INFLUXDB_TOKEN"),
-        os.getenv("INFLUXDB_ORG"),
-        os.getenv("INFLUXDB_BUCKET"),
+        url=os.getenv("INFLUXDB_URL"),
+        token=os.getenv("INFLUXDB_TOKEN"),
+        org=os.getenv("INFLUXDB_ORG"),
+        bucket=os.getenv("INFLUXDB_BUCKET"),
     )
     watcher = VRChatLogWatcher(
-        Path(os.getenv("VRCHAT_LOG_DIR", "/app/vrchat_log")), influx,
+        log_dir=Path(os.getenv("VRCHAT_LOG_DIR", "/app/vrchat_log")),
+        data_dir=Path("data"),
+        influx=influx,
     )
 
     loop = asyncio.get_running_loop()

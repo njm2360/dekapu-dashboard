@@ -8,6 +8,7 @@ dependencies = [
     "aiohttp>=3.12.15",
     "dotenv>=0.9.9",
     "influxdb-client>=1.49.0",
+    "pydantic>=2.12.2",
     "tenacity>=9.1.2",
     "tzdata>=2025.2",
 ]
