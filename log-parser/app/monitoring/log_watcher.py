@@ -1,5 +1,7 @@
+import os
 import asyncio
 import logging
+from typing import Final
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -9,14 +11,20 @@ from influxdb_client import Point, WritePrecision
 from app.analysis.log_parser import MppLogParser
 from app.utils.offset_store import FileOffsetStore
 from app.utils.influxdb import InfluxWriterAsync
+from app.service.autosave_manager import AutoSaveManager
+from app.utils.cloudsave_state_store import CloudSaveStateStore
 
 
 class VRChatLogWatcher:
+    ENABLE_AUTOSAVE: Final[bool] = bool("ENABLE_AUTOSAVE" in os.environ)  # 実験的機能
+
     def __init__(self, log_dir: Path, data_dir: Path, influx: InfluxWriterAsync):
         self.log_dir = log_dir
         self.influx = influx
         self.parsers: dict[str, MppLogParser] = {}
         self.offset_store = FileOffsetStore(path=data_dir / "offsets.json")
+        self.cloud_state_store = CloudSaveStateStore(path=data_dir / "cloudsave.json")
+        self.autosave_mgr = AutoSaveManager(self.cloud_state_store)
 
         logging.info(f"[Watcher] Initialized. Log directory={log_dir}")
 
@@ -85,7 +93,9 @@ class VRChatLogWatcher:
                     )
 
                     if record.credit_all_delta_1m is not None:
-                        point = point.field("credit_all_delta_1m", record.credit_all_delta_1m)
+                        point = point.field(
+                            "credit_all_delta_1m", record.credit_all_delta_1m
+                        )
 
                     for k, v in record.data.model_dump_for_influx().items():
                         point = point.field(k, v)
@@ -106,10 +116,20 @@ class VRChatLogWatcher:
                         await asyncio.sleep(5)
                         continue
 
+                    if self.ENABLE_AUTOSAVE and record.data.credit_all is not None:
+                        await self.autosave_mgr.update(
+                            user_id=record.user_id,
+                            credit_all=record.data.credit_all,
+                            url=line,  # 行は全てURLなのでこれでOK
+                        )
+
         except FileNotFoundError:
             logging.error(f"[Watcher] File not found: {fname}")
         except PermissionError:
             logging.error(f"[Watcher] Permission denied: {fname}")
+
+        finally:
+            await self.autosave_mgr.close()
 
     async def run(self):
         tasks: dict[str, asyncio.Task] = {}
