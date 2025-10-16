@@ -252,16 +252,25 @@
               {
                 "color": "green",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
           "unit": "sishort"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "獲得ベースライン"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 7,
@@ -288,6 +297,15 @@
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\n  |> filter(fn: (r) => r.user == \"${user}\")\n  |> movingAverage(n: 60)\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n",
+          "refId": "B"
         }
       ],
       "title": "獲得速度(枚/min)",
@@ -1315,6 +1333,65 @@
         }
       ],
       "title": "?????",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 12,
+        "y": 19
+      },
+      "id": 75,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.0",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\" or r._field == \"blackbox_credits\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if exists r.task_cnt and r.task_cnt != 0.0 \r\n              then float(v: r.blackbox_credits) / float(v: r.task_cnt) \r\n              else 0.0\r\n    }))\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "???????獲得率",
       "type": "stat"
     },
     {
@@ -4593,5 +4670,5 @@
   "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 69
+  "version": 71
 }
