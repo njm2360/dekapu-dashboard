@@ -5,10 +5,12 @@ import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Final, Optional
+from pydantic import ValidationError
 from influxdb_client import Point, WritePrecision
 from urllib.parse import urlparse, parse_qs, unquote
 
 from app.analysis.medal_rate_ema import MedalRateEMA
+from app.model.mmp_savedata import MmpSaveData
 
 
 class MppLogParser:
@@ -79,7 +81,7 @@ class MppLogParser:
                 self.medal_rate.reset()
                 return None
 
-            # セッションリセットの検出(パーク振り直し)
+            # セッションリセットの検出
             if self.SESSION_RESET_MSG in line:
                 logging.info(
                     f"[{self.fname}] Session reset detected. Reset medal rate."
@@ -103,17 +105,30 @@ class MppLogParser:
             if self.SAVEDATA_URL_PREFIX in line:
                 parsed = urlparse(line)
                 query = parse_qs(parsed.query)
-                raw_data = unquote(query.get("data", ["{}"])[0])
+
+                data_param = query.get("data")
+                if not data_param or not data_param[0].strip():
+                    logging.warning(f"[{self.fname}] Missing 'data' parameter")
+                    return None
+
+                raw_data = unquote(data_param[0])
+
+                user_id_list = query.get("user_id")
+                if not user_id_list or not user_id_list[0]:
+                    logging.warning(f"[{self.fname}] Missing user_id in query")
+                    return None
+
+                user_id = user_id_list[0]
 
                 try:
-                    data: dict[str, any] = json.loads(raw_data)
+                    raw_dict: dict[str, any] = json.loads(raw_data)
+                    data = MmpSaveData(**raw_dict)
+                except ValidationError as e:
+                    logging.warning(f"[{self.fname}] Save data validation error: {e}")
+                    return None
                 except json.JSONDecodeError as e:
                     logging.warning(f"[{self.fname}] JSON decode error: {e}")
                     return None
-
-                user_id = query.get("user_id", [""])[0]
-                credit_all = data.get("credit_all")
-                l_achieve_count = len(data.get("l_achieve", []))
 
                 # タイムスタンプが未取得の場合、現在時刻で書き込む
                 timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
@@ -126,28 +141,15 @@ class MppLogParser:
                     Point("mpp-savedata")
                     .tag("user", user_id)
                     .time(timestamp, WritePrecision.NS)
-                    .field("l_achieve_count", l_achieve_count)
+                    .field("l_achieve_count", len(data.l_achieve or []))
                 )
 
-                for k, v in data.items():
-                    if isinstance(v, (int, float, str)):
-                        if isinstance(v, int):
-                            v = self.fix_overflow(v, 32)
-                        p = p.field(k, v)
-                    elif isinstance(v, dict) and k.startswith("dc_"):
-                        for sub_k, sub_v in v.items():
-                            if isinstance(sub_v, (int, float, str)):
-                                if isinstance(sub_v, int):
-                                    sub_v = self.fix_overflow(sub_v, 32)
-                                p = p.field(f"{k}_{sub_k}", sub_v)
-                    elif isinstance(v, list) and k.startswith("l_totems_set"):
-                        for i, item in enumerate(v, start=1):
-                            if isinstance(item, int):
-                                p = p.field(f"{k}_{i}", item)
+                for k, v in data.model_dump_for_influx().items():
+                    p = p.field(k, v)
 
-                if credit_all is not None:
+                if data.credit_all is not None:
                     # ストック溢れ分を差し引いて増加量を計算
-                    adjusted_credit = credit_all - self.last_stockover
+                    adjusted_credit = data.credit_all - self.last_stockover
                     delta = self.medal_rate.update(adjusted_credit, timestamp)
                     if delta is not None:
                         p = p.field("credit_all_delta_1m", delta)
