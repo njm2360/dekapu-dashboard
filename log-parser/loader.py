@@ -7,6 +7,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from aiohttp import ClientConnectorError
+from influxdb_client import Point, WritePrecision
 
 from app.analysis.log_parser import MppLogParser
 from app.utils.influxdb import InfluxWriterAsync
@@ -90,18 +91,30 @@ async def load_logs(
                     line = line.strip()
                     if not line:
                         continue
-                    point = parser.parse_line(line)
-                    if not point:
+                    record = parser.parse_line(line)
+                    if not record:
                         continue
 
-                    ts = getattr(point, "_time", None)
-                    if ts is None:
-                        continue
-
+                    ts = record.timestamp
                     if start_dt and ts < start_dt:
                         continue
                     if end_dt and ts > end_dt:
                         continue
+
+                    point = (
+                        Point("mpp-savedata")
+                        .tag("user", record.user_id)
+                        .time(record.timestamp, WritePrecision.NS)
+                        .field("l_achieve_count", len(record.data.l_achieve or []))
+                    )
+
+                    if record.credit_all_delta_1m is not None:
+                        point = point.field(
+                            "credit_all_delta_1m", record.credit_all_delta_1m
+                        )
+
+                    for k, v in record.data.model_dump_for_influx().items():
+                        point = point.field(k, v)
 
                     retry_count = 0
                     while retry_count < 3:
