@@ -1,18 +1,18 @@
+from dotenv import load_dotenv
+from app.utils.logger import setup_logger
+
+load_dotenv(override=True)
+setup_logger()
+
 import os
 import sys
 import signal
 import asyncio
 import logging
 from pathlib import Path
-from dotenv import load_dotenv
 
 from app.monitoring.log_watcher import VRChatLogWatcher
 from app.utils.influxdb import InfluxWriterAsync
-from app.utils.logger import setup_logger
-
-
-load_dotenv(override=True)
-setup_logger()
 
 
 async def main():
