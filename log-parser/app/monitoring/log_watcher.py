@@ -128,9 +128,6 @@ class VRChatLogWatcher:
         except PermissionError:
             logging.error(f"[Watcher] Permission denied: {fname}")
 
-        finally:
-            await self.autosave_mgr.close()
-
     async def run(self):
         tasks: dict[str, asyncio.Task] = {}
 
@@ -156,3 +153,4 @@ class VRChatLogWatcher:
         finally:
             await self._cleanup_offsets()
             await self.offset_store.flush()
+            await self.autosave_mgr.close()
