@@ -11,7 +11,7 @@ import asyncio
 import logging
 from pathlib import Path
 
-from app.monitoring.log_watcher import VRChatLogWatcher
+from app.service.log_watch_manager import LogWatcherManager
 from app.utils.influxdb import InfluxWriterAsync
 
 
@@ -22,7 +22,7 @@ async def main():
         org=os.getenv("INFLUXDB_ORG"),
         bucket=os.getenv("INFLUXDB_BUCKET"),
     )
-    watcher = VRChatLogWatcher(
+    watcher = LogWatcherManager(
         log_dir=Path(os.getenv("VRCHAT_LOG_DIR", "/app/vrchat_log")),
         data_dir=Path("data"),
         influx=influx,

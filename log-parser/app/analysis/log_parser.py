@@ -154,6 +154,7 @@ class MppLogParser:
                     timestamp=timestamp,
                     credit_all_delta_1m=credit_all_delta_1m,
                     data=data,
+                    raw_url=line,
                 )
 
             return None

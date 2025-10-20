@@ -1,58 +1,55 @@
 import os
 import asyncio
 import logging
-from typing import Final
 from pathlib import Path
+from typing import Final, Optional
 from datetime import datetime, timedelta
-
 from aiohttp import ClientConnectorError
 from influxdb_client import Point, WritePrecision
 
+from app.model.mmp_savedata import MmpSaveRecord
 from app.analysis.log_parser import MppLogParser
 from app.utils.offset_store import FileOffsetStore
 from app.utils.influxdb import InfluxWriterAsync
 from app.service.autosave_manager import AutoSaveManager
-from app.utils.cloudsave_state_store import CloudSaveStateStore
 
 
 class VRChatLogWatcher:
     ENABLE_AUTOSAVE: Final[bool] = bool("ENABLE_AUTOSAVE" in os.environ)  # 実験的機能
 
-    def __init__(self, log_dir: Path, data_dir: Path, influx: InfluxWriterAsync):
-        self.log_dir = log_dir
+    def __init__(
+        self,
+        log_file: Path,
+        influx: InfluxWriterAsync,
+        autosave_mgr: AutoSaveManager,
+        offset_store: FileOffsetStore,
+    ):
+        self.log_file = log_file
+        self.fname = log_file.name
         self.influx = influx
-        self.parsers: dict[str, MppLogParser] = {}
-        self.offset_store = FileOffsetStore(path=data_dir / "offsets.json")
-        self.cloud_state_store = CloudSaveStateStore(path=data_dir / "cloudsave.json")
-        self.autosave_mgr = AutoSaveManager(self.cloud_state_store)
+        self.autosave_mgr = autosave_mgr
+        self.offset_store = offset_store
+        self.parser = MppLogParser(self.fname)
+        self.last_record: Optional[MmpSaveRecord] = None
 
-        logging.info(f"[Watcher] Initialized. Log directory={log_dir}")
+    async def run(self):
+        offset = await self.offset_store.get(self.fname)
 
-    async def _cleanup_offsets(self):
-        logging.info("[Watcher] Cleanup stale offset entries")
-        existing_files = {f.name for f in self.log_dir.glob("output_log_*.txt")}
-
-        offsets = await self.offset_store.all()
-        for fname in set(offsets) - existing_files:
-            logging.info(f"[Watcher] Removing stale offset entry: {fname}")
-            await self.offset_store.remove(fname)
-
-    async def watch_file(self, log_file: Path):
-        fname = log_file.name
-        parser = self.parsers.setdefault(fname, MppLogParser(fname))
-        offset = await self.offset_store.get(fname)
-
-        logging.info(f"[Watcher] Start watching file={fname}, offset={offset}")
+        logging.info(f"[Watcher] Start watching file={self.fname}, offset={offset}")
 
         try:
-            with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+            with open(self.log_file, "r", encoding="utf-8", errors="ignore") as f:
                 # オフセット情報をもとにシーク
                 if offset is not None:
                     f.seek(offset)
-                    logging.info(f"[Watcher] Resumed from offset {offset} ({fname})")
+                    logging.info(
+                        f"[Watcher] Resumed from offset (Pos:{offset}) ({self.fname})"
+                    )
                 else:
                     f.seek(0, 2)
-                    logging.info(f"[Watcher] Skip to EOF (no offset) ({fname})")
+                    logging.info(
+                        f"[Watcher] Skip to EOF (Pos:{f.tell()}) ({self.fname})"
+                    )
 
                 last_activity = datetime.now()
 
@@ -60,10 +57,10 @@ class VRChatLogWatcher:
                     try:
                         line = f.readline().strip()
                     except UnicodeDecodeError as e:
-                        logging.warning(f"[Watcher] Decode error in {fname}: {e}")
+                        logging.warning(f"[Watcher] Decode error in {self.fname}: {e}")
                         continue
                     except OSError as e:
-                        logging.error(f"[Watcher] File read error {fname}: {e}")
+                        logging.error(f"[Watcher] File read error {self.fname}: {e}")
                         break
 
                     if not line:
@@ -71,19 +68,20 @@ class VRChatLogWatcher:
 
                         # 1時間更新がなければ監視を終了
                         if datetime.now() - last_activity > timedelta(hours=1):
-                            logging.info(f"[Watcher] Stop watching {fname}")
-                            await self.offset_store.remove(fname)
+                            logging.info(f"[Watcher] Stop watching {self.fname}")
+                            await self.offset_store.remove(self.fname)
                             break
                         continue
 
                     # オフセット更新
-                    await self.offset_store.set(fname, f.tell())
+                    await self.offset_store.set(self.fname, f.tell())
                     last_activity = datetime.now()
 
-                    record = parser.parse_line(line.strip())
-
+                    record = self.parser.parse_line(line.strip())
                     if not record:
                         continue
+
+                    self.last_record = record
 
                     point = (
                         Point("mpp-savedata")
@@ -102,55 +100,31 @@ class VRChatLogWatcher:
 
                     try:
                         await self.influx.write(point)
-                        logging.debug(f"[Watcher] Data write OK ({fname})")
+                        logging.debug(f"[Watcher] Data write OK ({self.fname})")
                     except ClientConnectorError as e:
                         logging.error(f"[Watcher] InfluxDB connect error: {e}")
-                        await asyncio.sleep(5)
-                        continue
                     except asyncio.TimeoutError:
-                        logging.error(f"[Watcher] InfluxDB write timeout ({fname})")
-                        await asyncio.sleep(5)
-                        continue
-                    except OSError as e:
-                        logging.error(f"[Watcher] InfluxDB write failed ({fname}): {e}")
-                        await asyncio.sleep(5)
-                        continue
-
-                    if self.ENABLE_AUTOSAVE and record.data.credit_all is not None:
-                        await self.autosave_mgr.update(
-                            user_id=record.user_id,
-                            credit_all=record.data.credit_all,
-                            url=line,  # 行は全てURLなのでこれでOK
+                        logging.error(
+                            f"[Watcher] InfluxDB write timeout ({self.fname})"
                         )
+                    except OSError as e:
+                        logging.error(
+                            f"[Watcher] InfluxDB write failed ({self.fname}): {e}"
+                        )
+
+                    if self.ENABLE_AUTOSAVE:
+                        await self.autosave_mgr.update(record)
 
         except FileNotFoundError:
-            logging.error(f"[Watcher] File not found: {fname}")
+            logging.error(f"[Watcher] File not found: {self.fname}")
         except PermissionError:
-            logging.error(f"[Watcher] Permission denied: {fname}")
-
-    async def run(self):
-        tasks: dict[str, asyncio.Task] = {}
-
-        try:
-            while True:
-                for log_file in self.log_dir.glob("output_log_*.txt"):
-                    if not log_file.is_file():
-                        continue
-
-                    # 1時間以上更新されていないファイルは無視
-                    if datetime.fromtimestamp(
-                        log_file.stat().st_mtime
-                    ) < datetime.now() - timedelta(hours=1):
-                        continue
-
-                    if log_file.name not in tasks or tasks[log_file.name].done():
-                        tasks[log_file.name] = asyncio.create_task(
-                            self.watch_file(log_file)
-                        )
-
-                await asyncio.sleep(10)
+            logging.error(f"[Watcher] Permission denied: {self.fname}")
+        except asyncio.CancelledError:
+            logging.info(f"[Watcher] Task cancelled: {self.fname}")
 
         finally:
-            await self._cleanup_offsets()
-            await self.offset_store.flush()
-            await self.autosave_mgr.close()
+            if self.last_record and self.ENABLE_AUTOSAVE:
+                await self.autosave_mgr.update(
+                    record=self.last_record,
+                    ignore_rate_limit=True,
+                )

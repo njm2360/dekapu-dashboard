@@ -21,7 +21,11 @@ class AutoSaveManager:
     async def close(self):
         await self._session.close()
 
-    async def update(self, user_id: str, credit_all: int, url: str):
+    async def update(self, record: MmpSaveRecord, ignore_rate_limit: bool = False):
+        credit_all = record.data.credit_all
+        if credit_all is None:
+            return
+
         now = datetime.now()
 
         record = await self._cloud_state_store.get(user_id)

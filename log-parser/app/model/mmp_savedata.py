@@ -96,4 +96,5 @@ class MmpSaveRecord(BaseModel):
     user_id: str  # ユーザー名
     timestamp: datetime  # タイムスタンプ
     credit_all_delta_1m: Optional[int]  # 1分当たりの獲得速度
-    data: MmpSaveData
+    data: MmpSaveData # データ部
+    raw_url: str # 生のセーブURL
