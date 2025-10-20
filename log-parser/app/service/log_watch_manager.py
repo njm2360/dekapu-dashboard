@@ -16,6 +16,9 @@ class LogWatcherManager:
     OFFSET_STORE_FILE: Final[str] = "offsets.json"
     CLOUD_STATE_FILE: Final[str] = "cloudsave.json"
 
+    # Note: pikachu0310さん協力の元の調整した数値です。サーバー負荷に繋がるので変更しないこと。
+    AUTOSAVE_INTERVAL: Final[int] = 1800
+
     def __init__(self, log_dir: Path, data_dir: Path, influx: InfluxWriterAsync):
         self.log_dir = log_dir
         self.influx = influx
@@ -23,7 +26,10 @@ class LogWatcherManager:
         self.cloud_state_store = CloudSaveStateStore(
             path=data_dir / self.CLOUD_STATE_FILE
         )
-        self.autosave_mgr = AutoSaveManager(self.cloud_state_store)
+        self.autosave_mgr = AutoSaveManager(
+            cloud_state_store=self.cloud_state_store,
+            save_interval=self.AUTOSAVE_INTERVAL,
+        )
         self.tasks: dict[str, asyncio.Task] = {}
 
         logging.info(f"[Manager] Initialized. Log directory={log_dir}")

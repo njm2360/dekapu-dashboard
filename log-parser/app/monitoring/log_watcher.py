@@ -127,13 +127,13 @@ class VRChatLogWatcher:
 
             case Event.DEKAPU_WORLD_LEAVE:
                 logging.info(
-                    f"[{self.fname}] Dekapu world leave detected."
+                    f"[{self.fname}] Dekapu world leave detected. Saving latest record."
                 )
                 await self._save_latest_record()
 
             case Event.VRCHAT_APP_QUIT:
                 logging.info(
-                    f"[{self.fname}] VRChat app quit detected."
+                    f"[{self.fname}] VRChat app quit detected.. Saving latest record."
                 )
                 await self._save_latest_record()
 
@@ -173,7 +173,4 @@ class VRChatLogWatcher:
         if not self.last_record:
             return
 
-        logging.info(
-            f"[{self.fname}] Saving latest save data record."
-        )
         await self.autosave_mgr.update(self.last_record, ignore_rate_limit=True)

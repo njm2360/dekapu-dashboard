@@ -9,9 +9,7 @@ from app.utils.cloudsave_state_store import CloudSaveState, CloudSaveStateStore
 
 
 class AutoSaveManager:
-    def __init__(
-        self, cloud_state_store: CloudSaveStateStore, save_interval: int = 300
-    ):
+    def __init__(self, cloud_state_store: CloudSaveStateStore, save_interval: int):
         self._cloud_state_store = cloud_state_store
         self._save_interval = save_interval
 
@@ -43,6 +41,9 @@ class AutoSaveManager:
             if not ignore_rate_limit and now - last_attempt_at < timedelta(
                 seconds=self._save_interval
             ):
+                logging.debug(
+                    f"[CloudSave] Save skipped (rate limit exceed) (user={user_id})"
+                )
                 return
 
             # 総獲得が巻き戻っている場合はセーブしない
@@ -56,7 +57,7 @@ class AutoSaveManager:
             data_hash = self._calc_data_hash(record.data)
 
             if data_hash == last_data_hash:
-                logging.warning(
+                logging.debug(
                     f"[CloudSave] Save skipped (no data change) (user={user_id})"
                 )
                 return
