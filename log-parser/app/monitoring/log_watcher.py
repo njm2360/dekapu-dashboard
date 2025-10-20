@@ -3,15 +3,16 @@ import asyncio
 import logging
 from pathlib import Path
 from typing import Final, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from aiohttp import ClientConnectorError
 from influxdb_client import Point, WritePrecision
 
 from app.model.mmp_savedata import MmpSaveRecord
-from app.analysis.log_parser import MppLogParser
+from app.analysis.log_parser import MppLogParser, Event
 from app.utils.offset_store import FileOffsetStore
 from app.utils.influxdb import InfluxWriterAsync
 from app.service.autosave_manager import AutoSaveManager
+from app.analysis.medal_rate_ema import MedalRateEMA
 
 
 class VRChatLogWatcher:
@@ -26,11 +27,17 @@ class VRChatLogWatcher:
     ):
         self.log_file = log_file
         self.fname = log_file.name
+
         self.influx = influx
         self.autosave_mgr = autosave_mgr
         self.offset_store = offset_store
         self.parser = MppLogParser(self.fname)
+
+        self.last_timestamp: Optional[datetime] = None
         self.last_record: Optional[MmpSaveRecord] = None
+
+        self.stock_over = 0
+        self.medal_rate = MedalRateEMA()
 
     async def run(self):
         offset = await self.offset_store.get(self.fname)
@@ -77,43 +84,98 @@ class VRChatLogWatcher:
                     await self.offset_store.set(self.fname, f.tell())
                     last_activity = datetime.now()
 
-                    record = self.parser.parse_line(line.strip())
-                    if not record:
+                    result = self.parser.parse_line(line.strip())
+                    if not result:
                         continue
 
-                    self.last_record = record
+                    match result.event:
+                        case Event.TIMESTAMP_UPDATE:
+                            if ts := result.new_timestamp:
+                                self.last_timestamp = ts
+                        case Event.DEKAPU_JP_STOCKOVER:
+                            if value := result.stockover_value:
+                                self.stock_over += value
+                                logging.debug(
+                                    f"[{self.fname}] JP stockover added: {value}"
+                                )
+                        case Event.DEKAPU_CLOUD_LOAD:
+                            logging.info(
+                                f"[{self.fname}] Cloud load detected. Reset medal rate."
+                            )
+                            self.medal_rate.reset()
+                        case Event.DEKAPU_SESSION_RESET:
+                            logging.info(
+                                f"[{self.fname}] Session reset detected. Reset medal rate."
+                            )
+                            self.medal_rate.reset()
+                        case Event.DEKAPU_WORLD_JOIN:
+                            logging.info(
+                                f"[{self.fname}] Dekapu world join detected. Reset medal rate."
+                            )
+                            self.medal_rate.reset()
+                        case Event.DEKAPU_WORLD_LEAVE:
+                            logging.info(f"[{self.fname}] Dekapu world leave detected.")
+                        case Event.VRCHAT_APP_QUIT:
+                            logging.info(f"[{self.fname}] VRChat app quit detected.")
+                        case Event.DEKAPU_SAVEDATA_UPDATE:
+                            if result.record is None:
+                                continue
 
-                    point = (
-                        Point("mpp-savedata")
-                        .tag("user", record.user_id)
-                        .time(record.timestamp, WritePrecision.NS)
-                        .field("l_achieve_count", len(record.data.l_achieve or []))
-                    )
+                            record = result.record
+                            self.last_record = record
 
-                    if record.credit_all_delta_1m is not None:
-                        point = point.field(
-                            "credit_all_delta_1m", record.credit_all_delta_1m
-                        )
+                            # タイムスタンプが未取得の場合は現在時刻とする
+                            # Memo: データ内のlastsaveがセーブURL生成時刻かも?
+                            timestamp = self.last_timestamp or datetime.now(
+                                timezone.utc
+                            )
+                            if not self.last_timestamp:
+                                logging.warning(
+                                    f"[{self.fname}] No timestamp captured, fallback to now."
+                                )
 
-                    for k, v in record.data.model_dump_for_influx().items():
-                        point = point.field(k, v)
+                            point = (
+                                Point("mpp-savedata")
+                                .tag("user", record.user_id)
+                                .time(timestamp, WritePrecision.NS)
+                                .field(
+                                    "l_achieve_count", len(record.data.l_achieve or [])
+                                )
+                            )
 
-                    try:
-                        await self.influx.write(point)
-                        logging.debug(f"[Watcher] Data write OK ({self.fname})")
-                    except ClientConnectorError as e:
-                        logging.error(f"[Watcher] InfluxDB connect error: {e}")
-                    except asyncio.TimeoutError:
-                        logging.error(
-                            f"[Watcher] InfluxDB write timeout ({self.fname})"
-                        )
-                    except OSError as e:
-                        logging.error(
-                            f"[Watcher] InfluxDB write failed ({self.fname}): {e}"
-                        )
+                            if record.data.credit_all is not None:
+                                # ストック溢れ分を差し引いて増加量を計算
+                                adjusted_credit = (
+                                    record.data.credit_all - self.stock_over
+                                )
+                                delta = self.medal_rate.update(
+                                    adjusted_credit, timestamp
+                                )
+                                if delta is not None:
+                                    point = point.field("credit_all_delta_1m", delta)
+                                    logging.debug(
+                                        f"[{self.fname}] Credit delta: {delta}/min"
+                                    )
 
-                    if self.ENABLE_AUTOSAVE:
-                        await self.autosave_mgr.update(record)
+                            for k, v in record.data.model_dump_for_influx().items():
+                                point = point.field(k, v)
+
+                            try:
+                                await self.influx.write(point)
+                                logging.debug(f"[Watcher] Data write OK ({self.fname})")
+                            except ClientConnectorError as e:
+                                logging.error(f"[Watcher] InfluxDB connect error: {e}")
+                            except asyncio.TimeoutError:
+                                logging.error(
+                                    f"[Watcher] InfluxDB write timeout ({self.fname})"
+                                )
+                            except OSError as e:
+                                logging.error(
+                                    f"[Watcher] InfluxDB write failed ({self.fname}): {e}"
+                                )
+
+                            if self.ENABLE_AUTOSAVE:
+                                await self.autosave_mgr.update(record)
 
         except FileNotFoundError:
             logging.error(f"[Watcher] File not found: {self.fname}")
