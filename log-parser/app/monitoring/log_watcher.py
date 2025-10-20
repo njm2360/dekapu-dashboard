@@ -16,8 +16,6 @@ from app.analysis.medal_rate_ema import MedalRateEMA
 
 
 class VRChatLogWatcher:
-    ENABLE_AUTOSAVE: Final[bool] = bool("ENABLE_AUTOSAVE" in os.environ)  # 実験的機能
-
     def __init__(
         self,
         log_file: Path,
@@ -115,8 +113,16 @@ class VRChatLogWatcher:
                             self.medal_rate.reset()
                         case Event.DEKAPU_WORLD_LEAVE:
                             logging.info(f"[{self.fname}] Dekapu world leave detected.")
+                            await self.autosave_mgr.update(
+                                self.last_record, ignore_rate_limit=True
+                            )
                         case Event.VRCHAT_APP_QUIT:
                             logging.info(f"[{self.fname}] VRChat app quit detected.")
+                            await self.autosave_mgr.update(
+                                self.last_record, ignore_rate_limit=True
+                            )
+                            break  # このログにはもう追記されないためタスク終了
+
                         case Event.DEKAPU_SAVEDATA_UPDATE:
                             if result.record is None:
                                 continue
@@ -126,9 +132,7 @@ class VRChatLogWatcher:
 
                             # タイムスタンプが未取得の場合は現在時刻とする
                             # Memo: データ内のlastsaveがセーブURL生成時刻かも?
-                            timestamp = self.last_timestamp or datetime.now(
-                                timezone.utc
-                            )
+                            ts = self.last_timestamp or datetime.now(timezone.utc)
                             if not self.last_timestamp:
                                 logging.warning(
                                     f"[{self.fname}] No timestamp captured, fallback to now."
@@ -137,20 +141,17 @@ class VRChatLogWatcher:
                             point = (
                                 Point("mpp-savedata")
                                 .tag("user", record.user_id)
-                                .time(timestamp, WritePrecision.NS)
+                                .time(ts, WritePrecision.NS)
                                 .field(
                                     "l_achieve_count", len(record.data.l_achieve or [])
                                 )
                             )
 
-                            if record.data.credit_all is not None:
+                            credit_all = record.data.credit_all
+                            if credit_all is not None:
                                 # ストック溢れ分を差し引いて増加量を計算
-                                adjusted_credit = (
-                                    record.data.credit_all - self.stock_over
-                                )
-                                delta = self.medal_rate.update(
-                                    adjusted_credit, timestamp
-                                )
+                                fixed_credit = credit_all - self.stock_over
+                                delta = self.medal_rate.update(fixed_credit, ts)
                                 if delta is not None:
                                     point = point.field("credit_all_delta_1m", delta)
                                     logging.debug(
@@ -160,6 +161,7 @@ class VRChatLogWatcher:
                             for k, v in record.data.model_dump_for_influx().items():
                                 point = point.field(k, v)
 
+                            # InfluxDBプッシュ
                             try:
                                 await self.influx.write(point)
                                 logging.debug(f"[Watcher] Data write OK ({self.fname})")
@@ -174,8 +176,8 @@ class VRChatLogWatcher:
                                     f"[Watcher] InfluxDB write failed ({self.fname}): {e}"
                                 )
 
-                            if self.ENABLE_AUTOSAVE:
-                                await self.autosave_mgr.update(record)
+                            # 自動クラウドセーブ
+                            await self.autosave_mgr.update(record)
 
         except FileNotFoundError:
             logging.error(f"[Watcher] File not found: {self.fname}")
@@ -185,7 +187,7 @@ class VRChatLogWatcher:
             logging.info(f"[Watcher] Task cancelled: {self.fname}")
 
         finally:
-            if self.last_record and self.ENABLE_AUTOSAVE:
+            if self.last_record:
                 await self.autosave_mgr.update(
                     record=self.last_record,
                     ignore_rate_limit=True,
