@@ -17,8 +17,12 @@ class AutoSaveManager:
             timeout=aiohttp.ClientTimeout(total=15),
             headers={"User-Agent": "dekapu-dashboard"},
         )
+        self._pending_tasks: set[asyncio.Task] = set()
 
     async def close(self):
+        if self._pending_tasks:
+            await asyncio.gather(*self._pending_tasks, return_exceptions=True)
+
         await self._session.close()
 
     async def update(self, record: MmpSaveRecord, ignore_rate_limit: bool = False):
@@ -73,7 +77,9 @@ class AutoSaveManager:
         )
 
         # 非同期タスクでクラウドセーブ
-        asyncio.create_task(self._do_request(url, user_id))
+        task = asyncio.create_task(self._do_request(url, user_id))
+        self._pending_tasks.add(task)
+        task.add_done_callback(self._pending_tasks.discard)
 
     async def _do_request(self, url: str, user_id: str):
         try:
