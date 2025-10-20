@@ -33,7 +33,6 @@ class VRChatLogWatcher:
         self.last_timestamp: Optional[datetime] = None
         self.last_record: Optional[MmpSaveRecord] = None
 
-        self.stock_over = 0
         self.medal_rate = MedalRateEMA()
 
     async def run(self):
@@ -93,17 +92,11 @@ class VRChatLogWatcher:
         return file
 
     async def _process_line(self, line: str):
-        try:
-            result = self.parser.parse_line(line)
-            if not result:
-                return
+        result = self.parser.parse_line(line)
+        if not result:
+            return
 
-            await self._handle_event(result)
-
-        except UnicodeDecodeError as e:
-            logging.warning(f"[Watcher] Decode error in {self.fname}: {e}")
-        except Exception as e:
-            logging.error(f"[Watcher] Unexpected error in line process: {e}")
+        await self._handle_event(result)
 
     async def _handle_event(self, result: ParseResult):
         match result.event:
@@ -113,7 +106,7 @@ class VRChatLogWatcher:
 
             case Event.DEKAPU_JP_STOCKOVER:
                 if value := result.stockover_value:
-                    self.stock_over += value
+                    self.medal_rate.add_offset(value)
                     logging.debug(f"[{self.fname}] JP stockover added: {value}")
 
             case Event.DEKAPU_CLOUD_LOAD:
@@ -161,8 +154,7 @@ class VRChatLogWatcher:
 
         credit_all = record.data.credit_all
         if credit_all is not None:
-            fixed_credit = credit_all - self.stock_over
-            if delta := self.medal_rate.update(fixed_credit, ts):
+            if delta := self.medal_rate.update(credit_all, ts):
                 point = point.field("credit_all_delta_1m", delta)
                 logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
 
