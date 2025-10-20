@@ -21,9 +21,11 @@ class AutoSaveManager:
 
     async def close(self):
         if self._pending_tasks:
+            logging.info("[CloudSave] Waiting for pending request(s)")
             await asyncio.gather(*self._pending_tasks, return_exceptions=True)
 
         await self._session.close()
+        logging.info("[CloudSave] session closed")
 
     async def update(self, record: MmpSaveRecord, ignore_rate_limit: bool = False):
         credit_all = record.data.credit_all

@@ -74,7 +74,7 @@ class LogWatcherManager:
                 await asyncio.sleep(10)
 
         except asyncio.CancelledError:
-            logging.info("[Manager] Run loop cancelled.")
+            logging.info("[Manager] File watch task cancelled.")
 
         finally:
             for name, task in self.tasks.items():

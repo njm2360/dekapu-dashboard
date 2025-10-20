@@ -39,11 +39,13 @@ class VRChatLogWatcher:
         file: Optional[TextIO] = None
         offset = await self.offset_store.get(self.fname)
 
+        logging.info(f"[Watcher] Start watching file ({self.fname})")
+        if offset is not None:
+            logging.info(f"[Watcher] Found read offset (Pos: {offset}) ({self.fname})")
+
         try:
             file = self._open_file_and_seek(offset)
             last_activity = datetime.now()
-
-            logging.info(f"[Watcher] Start watching file={self.fname}, offset={offset}")
 
             while True:
                 line = file.readline().strip()
@@ -53,8 +55,7 @@ class VRChatLogWatcher:
 
                     # 1時間更新がなければ監視を終了
                     if datetime.now() - last_activity > timedelta(hours=1):
-                        logging.info(f"[Watcher] Stop watching {self.fname}")
-                        await self.offset_store.remove(self.fname)
+                        logging.info(f"[Watcher] Stop watching file {self.fname}")
                         break
                     continue
 
@@ -84,10 +85,12 @@ class VRChatLogWatcher:
 
         if offset is not None:
             file.seek(offset)
-            logging.info(f"[Watcher] Resumed from offset (Pos:{offset}) ({self.fname})")
+            logging.info(
+                f"[Watcher] Resumed from offset (Pos: {offset}) ({self.fname})"
+            )
         else:
             file.seek(0, 2)
-            logging.info(f"[Watcher] Skip to EOF (Pos:{file.tell()}) ({self.fname})")
+            logging.info(f"[Watcher] Skip to EOF (Pos: {file.tell()}) ({self.fname})")
 
         return file
 
