@@ -1,8 +1,9 @@
 import asyncio
 import logging
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from typing import Optional, TextIO
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from aiohttp import ClientConnectorError
 from influxdb_client import Point, WritePrecision
 
@@ -26,6 +27,7 @@ class VRChatLogWatcher:
         self.fname = log_file.name
 
         self.influx = influx
+        self.influx_tasks: set[asyncio.Task] = set()
         self.autosave_mgr = autosave_mgr
         self.offset_store = offset_store
         self.parser = MppLogParser(self.fname)
@@ -34,6 +36,7 @@ class VRChatLogWatcher:
         self.last_record: Optional[MmpSaveRecord] = None
 
         self.medal_rate = MedalRateEMA()
+        self.wait_leave_resume_url: bool = False
 
     async def run(self):
         file: Optional[TextIO] = None
@@ -51,12 +54,15 @@ class VRChatLogWatcher:
                 line = file.readline().strip()
 
                 if not line:
-                    await asyncio.sleep(1)
-
                     # 1時間更新がなければ監視を終了
                     if datetime.now() - last_activity > timedelta(hours=1):
                         logging.info(f"[Watcher] Stop watching file {self.fname}")
+                        # ここでセーブするデータはないはずだが念の為セーブする
+                        # (VRChat異常終了などでログが正常に出なかった場合など)
+                        await self._save_latest_record()
                         break
+
+                    await asyncio.sleep(1)
                     continue
 
                 # オフセット更新
@@ -78,7 +84,12 @@ class VRChatLogWatcher:
             if file and not file.closed:
                 file.close()
 
-            await self._save_latest_record()
+            if self.influx_tasks:
+                logging.info(f"[Watcher] Waiting InfluxDB push tasks...")
+                _, pending = await asyncio.wait(self.influx_tasks, timeout=5.0)
+                if pending:
+                    for t in pending:
+                        t.cancel()
 
     def _open_file_and_seek(self, offset: Optional[int]) -> TextIO:
         file = open(self.log_file, "r", encoding="utf-8", errors="ignore")
@@ -104,8 +115,8 @@ class VRChatLogWatcher:
     async def _handle_event(self, result: ParseResult):
         match result.event:
             case Event.TIMESTAMP_UPDATE:
-                if ts := result.new_timestamp:
-                    self.last_timestamp = ts
+                if timestamp := result.new_timestamp:
+                    self.last_timestamp = timestamp
 
             case Event.DEKAPU_JP_STOCKOVER:
                 if value := result.stockover_value:
@@ -130,9 +141,10 @@ class VRChatLogWatcher:
 
             case Event.DEKAPU_WORLD_LEAVE:
                 logging.info(
-                    f"[{self.fname}] Dekapu world leave detected. Saving latest record."
+                    f"[{self.fname}] Dekapu world leave detected. Waiting for leave save."
                 )
-                await self._save_latest_record()
+                # Leave検出したあとに復帰用URLが発行されるのでこの地点では強制セーブしない
+                self.wait_leave_resume_url = True
 
             case Event.VRCHAT_APP_QUIT:
                 logging.info(
@@ -141,25 +153,61 @@ class VRChatLogWatcher:
                 await self._save_latest_record()
 
             case Event.DEKAPU_SAVEDATA_UPDATE:
-                if result.record:
-                    await self._handle_savedata(result.record)
+                if (record := result.record) is None:
+                    return
+                self.last_record = record
 
-    async def _handle_savedata(self, record: MmpSaveRecord):
-        self.last_record = record
-        ts = self.last_timestamp or datetime.now(timezone.utc)
+                timestamp = self.last_timestamp or datetime.now(ZoneInfo("UTC"))
 
+                delta = self.calc_medal_rate_ema(timestamp=timestamp, record=record)
+
+                task = asyncio.create_task(
+                    self._push_influxdb(
+                        timestamp=timestamp,
+                        record=record,
+                        credit_all_delta_1m=delta,
+                    )
+                )
+                self.influx_tasks.add(task)
+                task.add_done_callback(self.influx_tasks.discard)
+
+                # 退出時の復帰用URLはレート無視して保存
+                if self.wait_leave_resume_url:
+                    self.wait_leave_resume_url = False
+                    await self.autosave_mgr.update(
+                        record=record, ignore_rate_limit=True
+                    )
+                    return
+
+                await self.autosave_mgr.update(record)
+
+    def calc_medal_rate_ema(
+        self, timestamp: datetime, record: MmpSaveRecord
+    ) -> Optional[int]:
+        credit_all = record.data.credit_all
+        if credit_all is None:
+            return
+
+        delta = self.medal_rate.update(total=credit_all, timestamp=timestamp)
+        if delta:
+            logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
+        return delta
+
+    async def _push_influxdb(
+        self,
+        timestamp: datetime,
+        record: MmpSaveRecord,
+        credit_all_delta_1m: Optional[int],
+    ):
         point = (
             Point("mpp-savedata")
             .tag("user", record.user_id)
-            .time(ts, WritePrecision.NS)
+            .time(timestamp, WritePrecision.NS)
             .field("l_achieve_count", len(record.data.l_achieve or []))
         )
 
-        credit_all = record.data.credit_all
-        if credit_all is not None:
-            if delta := self.medal_rate.update(credit_all, ts):
-                point = point.field("credit_all_delta_1m", delta)
-                logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
+        if credit_all_delta_1m:
+            point = point.field("credit_all_delta_1m", credit_all_delta_1m)
 
         for k, v in record.data.model_dump_for_influx().items():
             point = point.field(k, v)
@@ -169,8 +217,6 @@ class VRChatLogWatcher:
             logging.debug(f"[Watcher] Data write OK ({self.fname})")
         except (ClientConnectorError, asyncio.TimeoutError, OSError) as e:
             logging.error(f"[Watcher] InfluxDB write failed ({self.fname}): {e}")
-
-        await self.autosave_mgr.update(record)
 
     async def _save_latest_record(self):
         if not self.last_record:
