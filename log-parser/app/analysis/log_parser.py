@@ -2,37 +2,57 @@ import os
 import re
 import json
 import logging
+from enum import Enum, auto
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from dataclasses import dataclass
 from typing import Final, Optional
 from pydantic import ValidationError
 from urllib.parse import urlparse, parse_qs, unquote
 
-from app.analysis.medal_rate_ema import MedalRateEMA
 from app.model.mmp_savedata import MmpSaveData, MmpSaveRecord
+
+
+class Event(Enum):
+    DEKAPU_SAVEDATA_UPDATE = auto()
+    DEKAPU_WORLD_JOIN = auto()
+    DEKAPU_WORLD_LEAVE = auto()
+    DEKAPU_SESSION_RESET = auto()
+    DEKAPU_CLOUD_LOAD = auto()
+    DEKAPU_JP_STOCKOVER = auto()
+    VRCHAT_APP_QUIT = auto()
+    TIMESTAMP_UPDATE = auto()
+
+
+@dataclass
+class ParseResult:
+    event: Event  # イベント種別
+
+    record: Optional[MmpSaveRecord] = None  # MMPセーブデータレコード
+    stockover_value: Optional[int] = None  # JPストック溢れ値用
+    new_timestamp: Optional[datetime] = None  # タイムスタンプ更新用
 
 
 class MppLogParser:
     SAVEDATA_URL_PATTERN: Final[re.Pattern] = re.compile(
         r"https://push\.trap\.games/api/v\d+/data"
     )
-    TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
     CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
     SESSION_RESET_MSG: Final[str] = "[ResetCurrentSession]"
     JP_STOCK_OVER_MSG: Final[str] = "[JP] ストック溢れです"
     WORLD_JOIN_MSG: Final[str] = (
         "[Behaviour] Joining wrld_1af53798-92a3-4c3f-99ae-a7c42ec6084d"
     )
+    WORLD_LEAVE_MSG: Final[str] = "[OnPlayerLeft] ローカルプレイヤーが Leave した"
+    VRCHAT_APP_QUIT_MSG: Final[str] = "VRCApplication: HandleApplicationQuit"
 
+    DSM_TIMESTAMP_PREFIX: Final[str] = "[DSM SaveURL] Generated URL"
     TIMESTAMP_RE = re.compile(r"^(\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2})")
 
     DEFAULT_TZ: Final[str] = "Asia/Tokyo"
 
     def __init__(self, fname: str):
         self.fname = fname
-        self.medal_rate = MedalRateEMA()
-        self.last_timestamp: Optional[datetime] = None
-        self.last_stockover: int = 0
 
         # TZ環境変数がない場合はAsia/Tokyoとして解釈する
         tz_name = os.getenv("TZ", self.DEFAULT_TZ)
@@ -43,7 +63,7 @@ class MppLogParser:
             logging.warning(f"[{self.fname}] Invalid timezone. ({tz_name})")
             self.tz = ZoneInfo(self.DEFAULT_TZ)
 
-    def _parse_timestamp_line(self, line: str):
+    def _parse_timestamp_line(self, line: str) -> Optional[datetime]:
         # YYYY.MM.DD HH:MM:SS形式のタイムスタンプを抽出
         m = self.TIMESTAMP_RE.match(line)
         if not m:
@@ -52,75 +72,70 @@ class MppLogParser:
         try:
             ts = datetime.strptime(m.group(1), "%Y.%m.%d %H:%M:%S")
             # InfluxDBで扱うためUTCに変換
-            self.last_timestamp = ts.replace(tzinfo=self.tz).astimezone(ZoneInfo("UTC"))
+            return ts.replace(tzinfo=self.tz).astimezone(ZoneInfo("UTC"))
         except Exception as e:
             logging.warning(f"[{self.fname}] Failed to parse timestamp: {e}")
 
-    def _parse_jp_stockover_line(self, line: str):
+    def _parse_jp_stockover_line(self, line: str) -> Optional[int]:
         m = re.search(r":\s*([\d,]+)$", line)
         if not m:
             return
 
         try:
-            num_str = m.group(1)
-            stock = int(num_str.replace(",", ""))
-            self.last_stockover += stock
-            logging.debug(f"[{self.fname}] JP stockover added: {stock}")
+            return int(m.group(1).replace(",", ""))
         except Exception as e:
             logging.warning(f"[{self.fname}] Failed to parse JP stockover: {e}")
 
-    def parse_line(self, line: str) -> Optional[MmpSaveRecord]:
+    def parse_line(self, line: str) -> Optional[ParseResult]:
         try:
-            # タイムスタンプ行の検出
-            if self.TIMESTAMP_PREFIX in line:
-                self._parse_timestamp_line(line)
-                return None
+            # セーブデータのタイムスタンプ行の検出
+            if self.DSM_TIMESTAMP_PREFIX in line:
+                ts = self._parse_timestamp_line(line)
+                return ParseResult(event=Event.TIMESTAMP_UPDATE, new_timestamp=ts)
 
             # クラウドロードの検出
             if self.CLOUD_LOAD_MSG in line:
-                logging.info(f"[{self.fname}] Cloud load detected. Reset medal rate.")
-                self.medal_rate.reset()
-                return None
+                return ParseResult(event=Event.DEKAPU_CLOUD_LOAD)
 
             # セッションリセットの検出
             if self.SESSION_RESET_MSG in line:
-                logging.info(
-                    f"[{self.fname}] Session reset detected. Reset medal rate."
-                )
-                self.medal_rate.reset()
-                return None
+                return ParseResult(event=Event.DEKAPU_SESSION_RESET)
 
             # JPストック溢れの検出
             if self.JP_STOCK_OVER_MSG in line:
-                self._parse_jp_stockover_line(line)
-                return None
+                value = self._parse_jp_stockover_line(line)
+                return ParseResult(
+                    event=Event.DEKAPU_JP_STOCKOVER, stockover_value=value
+                )
 
             # でかプへのJoin検出
             if self.WORLD_JOIN_MSG in line:
-                logging.info(
-                    f"[{self.fname}] Dekapu world join detected. Reset medal rate."
-                )
-                self.medal_rate.reset()
-                return None
+                return ParseResult(event=Event.DEKAPU_WORLD_JOIN)
 
-            # セーブデータ行の検出
+            # でかプからLeave検出
+            if self.WORLD_LEAVE_MSG in line:
+                return ParseResult(event=Event.DEKAPU_WORLD_LEAVE)
+
+            # VRChatアプリ終了検出
+            if self.VRCHAT_APP_QUIT_MSG in line:
+                return ParseResult(event=Event.VRCHAT_APP_QUIT)
+
+            # セーブデータ行の解析
             if self.SAVEDATA_URL_PATTERN.search(line):
                 parsed = urlparse(line)
                 query = parse_qs(parsed.query)
 
-                data_param = query.get("data")
-                if not data_param or not data_param[0].strip():
-                    logging.warning(f"[{self.fname}] Missing data parameter")
+                raw_data = self._get_query_param(query, "data")
+                if not raw_data:
                     return None
 
-                raw_data = unquote(data_param[0])
-
-                user_id_list = query.get("user_id")
-                if not user_id_list or not user_id_list[0]:
-                    logging.warning(f"[{self.fname}] Missing user_id parameter")
+                user_id = self._get_query_param(query, "user_id")
+                if not user_id:
                     return None
 
-                user_id = user_id_list[0]
+                sig = self._get_query_param(query, "sig")
+                if not sig:
+                    return None
 
                 try:
                     raw_dict: dict[str, any] = json.loads(raw_data)
@@ -132,28 +147,14 @@ class MppLogParser:
                     logging.warning(f"[{self.fname}] JSON decode error: {e}")
                     return None
 
-                # タイムスタンプが未取得の場合は現在時刻とする
-                # Memo: データ内のlastsaveがセーブURL生成時刻かも?
-                timestamp = self.last_timestamp or datetime.now(tz=ZoneInfo("UTC"))
-                if not self.last_timestamp:
-                    logging.warning(
-                        f"[{self.fname}] No timestamp captured, fallback to now()"
-                    )
-
-                credit_all_delta_1m = None
-                if data.credit_all is not None:
-                    # ストック溢れ分を差し引いて増加量を計算
-                    adjusted_credit = data.credit_all - self.last_stockover
-                    delta = self.medal_rate.update(adjusted_credit, timestamp)
-                    if delta is not None:
-                        credit_all_delta_1m = delta
-                        logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
-
-                return MmpSaveRecord(
-                    user_id=user_id,
-                    timestamp=timestamp,
-                    credit_all_delta_1m=credit_all_delta_1m,
-                    data=data,
+                return ParseResult(
+                    event=Event.DEKAPU_SAVEDATA_UPDATE,
+                    record=MmpSaveRecord(
+                        data=data,
+                        user_id=user_id,
+                        sig=sig,
+                        raw_url=line,
+                    ),
                 )
 
             return None
@@ -167,6 +168,13 @@ class MppLogParser:
         except Exception as e:
             logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
             return None
+
+    def _get_query_param(self, query: dict[str, list[str]], key: str) -> Optional[str]:
+        values = query.get(key)
+        if not values or not values[0].strip():
+            logging.warning(f"[{self.fname}] Missing or empty parameter: {key}")
+            return None
+        return unquote(values[0])
 
     def fix_overflow(self, value: int, bits: int = 32):
         if value < 0:
