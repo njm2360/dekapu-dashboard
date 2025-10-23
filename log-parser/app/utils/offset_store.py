@@ -54,7 +54,7 @@ class FileOffsetStore:
                 if self._dirty:
                     await self._save()
         except asyncio.CancelledError:
-            logging.info("[OffsetStore] Autosave task cancelled gracefully")
+            logging.info("[OffsetStore] Autosave task cancelled")
 
     async def get(self, filename: str) -> Optional[int]:
         async with self._lock:
