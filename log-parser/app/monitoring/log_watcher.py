@@ -31,12 +31,16 @@ class VRChatLogWatcher:
         self.autosave_mgr = autosave_mgr
         self.offset_store = offset_store
         self.parser = MppLogParser(self.fname)
+        self.medal_rate = MedalRateEMA()
 
         self.last_timestamp: Optional[datetime] = None
         self.last_record: Optional[MmpSaveRecord] = None
-
-        self.medal_rate = MedalRateEMA()
         self.wait_leave_resume_url: bool = False
+        self.record_is_dirty: bool = False
+
+    @property
+    def has_unsaved_record(self) -> bool:
+        return bool(self.last_record and self.record_is_dirty)
 
     async def run(self):
         file: Optional[TextIO] = None
@@ -59,7 +63,11 @@ class VRChatLogWatcher:
                         logging.info(f"[Watcher] Stop watching file {self.fname}")
                         # ここでセーブするデータはないはずだが念の為セーブする
                         # (VRChat異常終了などでログが正常に出なかった場合など)
-                        await self._save_latest_record()
+                        if self.has_unsaved_record:
+                            logging.info(f"[{self.fname}] Saving unsaved record.")
+                            await self.autosave_mgr.update(
+                                self.last_record, ignore_rate_limit=True
+                            )
                         break
 
                     await asyncio.sleep(1)
@@ -106,7 +114,12 @@ class VRChatLogWatcher:
         return file
 
     async def _process_line(self, line: str):
-        result = self.parser.parse_line(line)
+        try:
+            result = self.parser.parse_line(line)
+        except Exception as e:
+            logging.error(f"[{self.fname}] Log parse error: {e}")
+            return
+
         if not result:
             return
 
@@ -147,18 +160,18 @@ class VRChatLogWatcher:
                 self.wait_leave_resume_url = True
 
             case Event.VRCHAT_APP_QUIT:
-                logging.info(
-                    f"[{self.fname}] VRChat app quit detected.. Saving latest record."
-                )
-                await self._save_latest_record()
+                logging.info(f"[{self.fname}] VRChat app quit detected.")
+                if self.has_unsaved_record:
+                    logging.info(f"[{self.fname}] Saving unsaved record.")
+                    await self.autosave_mgr.update(
+                        self.last_record, ignore_rate_limit=True
+                    )
 
             case Event.DEKAPU_SAVEDATA_UPDATE:
                 if (record := result.record) is None:
                     return
                 self.last_record = record
-
                 timestamp = self.last_timestamp or datetime.now(ZoneInfo("UTC"))
-
                 delta = self.calc_medal_rate_ema(timestamp=timestamp, record=record)
 
                 task = asyncio.create_task(
@@ -174,19 +187,24 @@ class VRChatLogWatcher:
                 # 退出時の復帰用URLはレート無視して保存
                 if self.wait_leave_resume_url:
                     self.wait_leave_resume_url = False
-                    await self.autosave_mgr.update(
+                    if await self.autosave_mgr.update(
                         record=record, ignore_rate_limit=True
-                    )
+                    ):
+                        self.record_is_dirty = False
                     return
 
-                await self.autosave_mgr.update(record)
+                # 通常セーブ
+                if await self.autosave_mgr.update(record):
+                    self.record_is_dirty = False
+                else:
+                    self.record_is_dirty = True
 
     def calc_medal_rate_ema(
         self, timestamp: datetime, record: MmpSaveRecord
     ) -> Optional[int]:
         credit_all = record.data.credit_all
         if credit_all is None:
-            return
+            return None
 
         delta = self.medal_rate.update(total=credit_all, timestamp=timestamp)
         if delta:
@@ -217,9 +235,3 @@ class VRChatLogWatcher:
             logging.debug(f"[Watcher] Data write OK ({self.fname})")
         except (ClientConnectorError, asyncio.TimeoutError, OSError) as e:
             logging.error(f"[Watcher] InfluxDB write failed ({self.fname}): {e}")
-
-    async def _save_latest_record(self):
-        if not self.last_record:
-            return
-
-        await self.autosave_mgr.update(self.last_record, ignore_rate_limit=True)

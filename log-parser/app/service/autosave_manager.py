@@ -27,10 +27,12 @@ class AutoSaveManager:
         await self._session.close()
         logging.info("[CloudSave] session closed")
 
-    async def update(self, record: MmpSaveRecord, ignore_rate_limit: bool = False):
+    async def update(
+        self, record: MmpSaveRecord, ignore_rate_limit: bool = False
+    ) -> bool:
         credit_all = record.data.credit_all
         if credit_all is None:
-            return
+            return False
 
         now = datetime.now()
         user_id = record.user_id
@@ -50,14 +52,14 @@ class AutoSaveManager:
                 logging.debug(
                     f"[CloudSave] Save skipped (rate limit exceed) (user={user_id})"
                 )
-                return
+                return False
 
             # 総獲得が巻き戻っている場合はセーブしない
             if credit_all < last_credit_all:
                 logging.warning(
                     f"[CloudSave] Data rollback detected - Skipping (user={user_id})"
                 )
-                return
+                return False
 
             # データが同一の場合セーブしない
             data_hash = self._calc_data_hash(record.data)
@@ -66,7 +68,7 @@ class AutoSaveManager:
                 logging.debug(
                     f"[CloudSave] Save skipped (no data change) (user={user_id})"
                 )
-                return
+                return False
 
         else:
             data_hash = self._calc_data_hash(record.data)
@@ -82,6 +84,7 @@ class AutoSaveManager:
         task = asyncio.create_task(self._do_request(url, user_id))
         self._pending_tasks.add(task)
         task.add_done_callback(self._pending_tasks.discard)
+        return True
 
     async def _do_request(self, url: str, user_id: str):
         try:
