@@ -22,6 +22,7 @@ class VRChatLogWatcher:
         influx: InfluxWriterAsync,
         autosave_mgr: AutoSaveManager,
         offset_store: FileOffsetStore,
+        enable_autosave: bool = True,
     ):
         self.log_file = log_file
         self.fname = log_file.name
@@ -29,6 +30,7 @@ class VRChatLogWatcher:
         self.influx = influx
         self.influx_tasks: set[asyncio.Task] = set()
         self.autosave_mgr = autosave_mgr
+        self.enable_autosave = enable_autosave
         self.offset_store = offset_store
         self.parser = MppLogParser(self.fname)
         self.medal_rate = MedalRateEMA()
@@ -63,7 +65,7 @@ class VRChatLogWatcher:
                         logging.info(f"[Watcher] Stop watching file {self.fname}")
                         # ここでセーブするデータはないはずだが念の為セーブする
                         # (VRChat異常終了などでログが正常に出なかった場合など)
-                        if self.has_unsaved_record:
+                        if self.enable_autosave and self.has_unsaved_record:
                             logging.info(f"[{self.fname}] Saving unsaved record.")
                             await self.autosave_mgr.update(
                                 self.last_record, ignore_rate_limit=True
@@ -161,11 +163,12 @@ class VRChatLogWatcher:
 
             case Event.VRCHAT_APP_QUIT:
                 logging.info(f"[{self.fname}] VRChat app quit detected.")
-                if self.has_unsaved_record:
+                if self.enable_autosave and self.has_unsaved_record:
                     logging.info(f"[{self.fname}] Saving unsaved record.")
-                    await self.autosave_mgr.update(
+                    if await self.autosave_mgr.update(
                         self.last_record, ignore_rate_limit=True
-                    )
+                    ):
+                        self.record_is_dirty = False
 
             case Event.DEKAPU_SAVEDATA_UPDATE:
                 if (record := result.record) is None:
@@ -183,6 +186,9 @@ class VRChatLogWatcher:
                 )
                 self.influx_tasks.add(task)
                 task.add_done_callback(self.influx_tasks.discard)
+
+                if not self.enable_autosave:
+                    return
 
                 # 退出時の復帰用URLはレート無視して保存
                 if self.wait_leave_resume_url:
