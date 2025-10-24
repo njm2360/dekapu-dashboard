@@ -76,10 +76,10 @@ class VRChatLogWatcher:
             logging.error(f"[Watcher] File not found: {self.fname}")
         except PermissionError:
             logging.error(f"[Watcher] Permission denied: {self.fname}")
-        except asyncio.CancelledError:
-            logging.info(f"[Watcher] Task cancelled: {self.fname}")
         except OSError as e:
             logging.error(f"[Watcher] File read error {self.fname}: {e}")
+        except asyncio.CancelledError:
+            logging.info(f"[Watcher] Task cancelled: {self.fname}")
 
         finally:
             if file and not file.closed:

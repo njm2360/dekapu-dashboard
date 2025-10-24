@@ -122,12 +122,6 @@ class MmpLogParser:
 
             return None
 
-        except UnicodeDecodeError as e:
-            logging.error(f"[{self.fname}] Encoding error in line: {e}")
-            return None
-        except (TypeError, KeyError) as e:
-            logging.error(f"[{self.fname}] Unexpected data format: {e}")
-            return None
         except Exception as e:
             logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
             return None
