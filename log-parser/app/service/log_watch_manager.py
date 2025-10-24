@@ -1,14 +1,16 @@
 import asyncio
 import logging
+import os
 from typing import Final
 from pathlib import Path
 from datetime import datetime, timedelta
 
-from app.utils.offset_store import FileOffsetStore
-from app.utils.influxdb import InfluxWriterAsync
-from app.service.autosave_manager import AutoSaveManager
-from app.utils.cloudsave_state_store import CloudSaveStateStore
 from app.monitoring.log_watcher import VRChatLogWatcher
+from app.service.autosave_manager import AutoSaveManager
+from app.utils.env import getenv_bool
+from app.utils.influxdb import InfluxWriterAsync
+from app.utils.offset_store import FileOffsetStore
+from app.utils.cloudsave_state_store import CloudSaveStateStore
 
 
 class LogWatcherManager:
@@ -31,6 +33,7 @@ class LogWatcherManager:
             save_interval=self.AUTOSAVE_INTERVAL,
         )
         self.tasks: dict[str, asyncio.Task] = {}
+        self.enable_autosave: bool = getenv_bool("ENABLE_AUTOSAVE", True)
 
         logging.info(f"[Manager] Initialized. Log directory={log_dir}")
 
@@ -66,6 +69,7 @@ class LogWatcherManager:
                             influx=self.influx,
                             autosave_mgr=self.autosave_mgr,
                             offset_store=self.offset_store,
+                            enable_autosave=self.enable_autosave,
                         )
                         self.tasks[fname] = asyncio.create_task(
                             coro=watcher.run(), name=f"[Watcher] {fname}"
