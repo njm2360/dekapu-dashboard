@@ -163,9 +163,10 @@ class VRChatLogWatcher:
                 logging.info(f"[{self.fname}] VRChat app quit detected.")
                 if self.has_unsaved_record:
                     logging.info(f"[{self.fname}] Saving unsaved record.")
-                    await self.autosave_mgr.update(
+                    if await self.autosave_mgr.update(
                         self.last_record, ignore_rate_limit=True
-                    )
+                    ):
+                        self.record_is_dirty = False
 
             case Event.DEKAPU_SAVEDATA_UPDATE:
                 if (record := result.record) is None:
