@@ -61,13 +61,6 @@ class VRChatLogWatcher:
                     # 1時間更新がなければ監視を終了
                     if datetime.now() - last_activity > timedelta(hours=1):
                         logging.info(f"[Watcher] Stop watching file {self.fname}")
-                        # ここでセーブするデータはないはずだが念の為セーブする
-                        # (VRChat異常終了などでログが正常に出なかった場合など)
-                        if self.enable_autosave and self.has_unsaved_record:
-                            logging.info(f"[{self.fname}] Saving unsaved record.")
-                            await self.autosave_mgr.update(
-                                self.last_record, ignore_rate_limit=True
-                            )
                         break
 
                     await asyncio.sleep(1)
@@ -91,6 +84,12 @@ class VRChatLogWatcher:
         finally:
             if file and not file.closed:
                 file.close()
+
+            if self.enable_autosave and self.has_unsaved_record:
+                logging.info(f"[{self.fname}] Saving unsaved record.")
+                await self.autosave_mgr.update(
+                    self.last_record, ignore_rate_limit=True
+                )
 
             if self.influx_tasks:
                 logging.info(f"[Watcher] Waiting InfluxDB push tasks...")

@@ -49,6 +49,8 @@ async def main():
         )
         for task in pending:
             task.cancel()
+
+        await asyncio.gather(*pending, return_exceptions=True)
     finally:
         await influx.close()
 
