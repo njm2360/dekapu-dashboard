@@ -30,13 +30,10 @@ class AutoSaveManager:
     async def update(
         self, record: MmpSaveRecord, ignore_rate_limit: bool = False
     ) -> bool:
-        credit_all = record.data.credit_all
-        if credit_all is None:
-            return False
-
         now = datetime.now()
         user_id = record.user_id
         url = record.raw_url
+        credit_all = record.data.credit_all
 
         state = await self._cloud_state_store.get(user_id)
 

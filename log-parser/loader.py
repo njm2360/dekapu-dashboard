@@ -9,9 +9,10 @@ from dotenv import load_dotenv
 from aiohttp import ClientConnectorError
 from influxdb_client import Point, WritePrecision
 
-from app.analysis.log_parser import MppLogParser
+from app.analysis.log_parser import Event, MmpLogParser
 from app.utils.influxdb import InfluxWriterAsync
 from app.utils.logger import setup_logger
+from app.analysis.medal_rate_ema import MedalRateEMA
 
 
 load_dotenv(override=True)
@@ -98,7 +99,8 @@ async def load_logs(
 
     for log_file in files:
         fname = log_file.name
-        parser = MppLogParser(fname)
+        parser = MmpLogParser(fname)
+        medal_rate = MedalRateEMA()
 
         logging.info(f"[Loader] Processing {fname}")
         try:
@@ -107,48 +109,77 @@ async def load_logs(
                     line = line.strip()
                     if not line:
                         continue
-                    record = parser.parse_line(line)
-                    if not record:
+                    result = parser.parse_line(line)
+                    if not result:
                         continue
 
-                    ts = record.timestamp
-                    if start_dt and ts < start_dt:
-                        continue
-                    if end_dt and ts > end_dt:
-                        continue
+                    match result.event:
+                        case Event.DEKAPU_JP_STOCKOVER:
+                            if result.stockover_value:
+                                medal_rate.add_offset(result.stockover_value)
 
-                    point = (
-                        Point("mpp-savedata")
-                        .tag("user", record.user_id)
-                        .time(record.timestamp, WritePrecision.NS)
-                        .field("l_achieve_count", len(record.data.l_achieve or []))
-                    )
+                        case (
+                            Event.DEKAPU_CLOUD_LOAD
+                            | Event.DEKAPU_SESSION_RESET
+                            | Event.DEKAPU_WORLD_JOIN
+                        ):
+                            medal_rate.reset()
 
-                    if record.credit_all_delta_1m is not None:
-                        point = point.field(
-                            "credit_all_delta_1m", record.credit_all_delta_1m
-                        )
+                        case Event.DEKAPU_SAVEDATA_UPDATE:
+                            if result.record is None:
+                                continue
 
-                    for k, v in record.data.model_dump_for_influx().items():
-                        point = point.field(k, v)
+                            record = result.record
+                            ts = record.data.lastsave
 
-                    retry_count = 0
-                    while retry_count < 3:
-                        try:
-                            await influx.write(point)
-                            total_points += 1
-                            break
-                        except (
-                            ClientConnectorError,
-                            asyncio.TimeoutError,
-                            OSError,
-                        ) as e:
-                            retry_count += 1
-                            logging.warning(f"[Loader] InfluxDB write failed {e}")
-                            await asyncio.sleep(3)
-                    else:
-                        logging.error(f"[Loader] InfluxDB write failed 3 times. Abort.")
-                        raise RuntimeError("InfluxDB write failed 3 times, aborting.")
+                            if start_dt and ts < start_dt:
+                                continue
+                            if end_dt and ts > end_dt:
+                                continue
+
+                            point = (
+                                Point("mpp-savedata")
+                                .tag("user", record.user_id)
+                                .time(ts, WritePrecision.NS)
+                                .field(
+                                    "l_achieve_count", len(record.data.l_achieve or [])
+                                )
+                            )
+
+                            delta = medal_rate.update(
+                                total=record.data.credit_all,
+                                timestamp=record.data.lastsave,
+                            )
+
+                            if delta is not None:
+                                point = point.field("credit_all_delta_1m", delta)
+
+                            for k, v in record.data.model_dump_for_influx().items():
+                                point = point.field(k, v)
+
+                            retry_count = 0
+                            while retry_count < 3:
+                                try:
+                                    await influx.write(point)
+                                    total_points += 1
+                                    break
+                                except (
+                                    ClientConnectorError,
+                                    asyncio.TimeoutError,
+                                    OSError,
+                                ) as e:
+                                    retry_count += 1
+                                    logging.warning(
+                                        f"[Loader] InfluxDB write failed {e}"
+                                    )
+                                    await asyncio.sleep(3)
+                            else:
+                                logging.error(
+                                    f"[Loader] InfluxDB write failed 3 times. Abort."
+                                )
+                                raise RuntimeError(
+                                    "InfluxDB write failed 3 times, aborting."
+                                )
 
         except FileNotFoundError:
             logging.error(f"[Loader] File not found: {fname}")
