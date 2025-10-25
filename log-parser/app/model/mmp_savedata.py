@@ -8,7 +8,7 @@ class MmpSaveData(BaseModel):
     version: int  # バージョン
     firstboot: datetime  # 初回起動日時
     lastsave: datetime  # 最終保存日時
-    hide_record: bool  # ランキング非公開
+    hide_record: int  # ランキング非公開
     credit: int  # 現在のメダル所持数
     playtime: int  # 総プレイ時間（秒）
     credit_all: int  # 累計メダル獲得数
