@@ -1,14 +1,13 @@
 import asyncio
 import logging
 from pathlib import Path
-from zoneinfo import ZoneInfo
 from typing import Optional, TextIO
 from datetime import datetime, timedelta
 from aiohttp import ClientConnectorError
 from influxdb_client import Point, WritePrecision
 
 from app.model.mmp_savedata import MmpSaveRecord
-from app.analysis.log_parser import MppLogParser, Event, ParseResult
+from app.analysis.log_parser import MmpLogParser, Event, ParseResult
 from app.utils.offset_store import FileOffsetStore
 from app.utils.influxdb import InfluxWriterAsync
 from app.service.autosave_manager import AutoSaveManager
@@ -32,10 +31,9 @@ class VRChatLogWatcher:
         self.autosave_mgr = autosave_mgr
         self.enable_autosave = enable_autosave
         self.offset_store = offset_store
-        self.parser = MppLogParser(self.fname)
+        self.parser = MmpLogParser(self.fname)
         self.medal_rate = MedalRateEMA()
 
-        self.last_timestamp: Optional[datetime] = None
         self.last_record: Optional[MmpSaveRecord] = None
         self.wait_leave_resume_url: bool = False
         self.record_is_dirty: bool = False
@@ -63,13 +61,6 @@ class VRChatLogWatcher:
                     # 1時間更新がなければ監視を終了
                     if datetime.now() - last_activity > timedelta(hours=1):
                         logging.info(f"[Watcher] Stop watching file {self.fname}")
-                        # ここでセーブするデータはないはずだが念の為セーブする
-                        # (VRChat異常終了などでログが正常に出なかった場合など)
-                        if self.enable_autosave and self.has_unsaved_record:
-                            logging.info(f"[{self.fname}] Saving unsaved record.")
-                            await self.autosave_mgr.update(
-                                self.last_record, ignore_rate_limit=True
-                            )
                         break
 
                     await asyncio.sleep(1)
@@ -85,14 +76,20 @@ class VRChatLogWatcher:
             logging.error(f"[Watcher] File not found: {self.fname}")
         except PermissionError:
             logging.error(f"[Watcher] Permission denied: {self.fname}")
-        except asyncio.CancelledError:
-            logging.info(f"[Watcher] Task cancelled: {self.fname}")
         except OSError as e:
             logging.error(f"[Watcher] File read error {self.fname}: {e}")
+        except asyncio.CancelledError:
+            logging.info(f"[Watcher] Task cancelled: {self.fname}")
 
         finally:
             if file and not file.closed:
                 file.close()
+
+            if self.enable_autosave and self.has_unsaved_record:
+                logging.info(f"[{self.fname}] Saving unsaved record.")
+                await self.autosave_mgr.update(
+                    self.last_record, ignore_rate_limit=True
+                )
 
             if self.influx_tasks:
                 logging.info(f"[Watcher] Waiting InfluxDB push tasks...")
@@ -129,10 +126,6 @@ class VRChatLogWatcher:
 
     async def _handle_event(self, result: ParseResult):
         match result.event:
-            case Event.TIMESTAMP_UPDATE:
-                if timestamp := result.new_timestamp:
-                    self.last_timestamp = timestamp
-
             case Event.DEKAPU_JP_STOCKOVER:
                 if value := result.stockover_value:
                     self.medal_rate.add_offset(value)
@@ -174,12 +167,10 @@ class VRChatLogWatcher:
                 if (record := result.record) is None:
                     return
                 self.last_record = record
-                timestamp = self.last_timestamp or datetime.now(ZoneInfo("UTC"))
-                delta = self.calc_medal_rate_ema(timestamp=timestamp, record=record)
+                delta = self.calc_medal_rate_ema(record=record)
 
                 task = asyncio.create_task(
                     self._push_influxdb(
-                        timestamp=timestamp,
                         record=record,
                         credit_all_delta_1m=delta,
                     )
@@ -205,28 +196,23 @@ class VRChatLogWatcher:
                 else:
                     self.record_is_dirty = True
 
-    def calc_medal_rate_ema(
-        self, timestamp: datetime, record: MmpSaveRecord
-    ) -> Optional[int]:
-        credit_all = record.data.credit_all
-        if credit_all is None:
-            return None
-
-        delta = self.medal_rate.update(total=credit_all, timestamp=timestamp)
+    def calc_medal_rate_ema(self, record: MmpSaveRecord) -> Optional[int]:
+        delta = self.medal_rate.update(
+            total=record.data.credit_all, timestamp=record.data.lastsave
+        )
         if delta:
             logging.debug(f"[{self.fname}] Credit delta: {delta}/min")
         return delta
 
     async def _push_influxdb(
         self,
-        timestamp: datetime,
         record: MmpSaveRecord,
         credit_all_delta_1m: Optional[int],
     ):
         point = (
             Point("mpp-savedata")
             .tag("user", record.user_id)
-            .time(timestamp, WritePrecision.NS)
+            .time(record.data.lastsave, WritePrecision.NS)
             .field("l_achieve_count", len(record.data.l_achieve or []))
         )
 

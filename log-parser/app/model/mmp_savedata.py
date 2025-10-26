@@ -1,16 +1,17 @@
-from datetime import datetime
-from typing import Optional, Dict, List
-from pydantic import BaseModel, ConfigDict
+import logging
+from datetime import datetime, timezone
+from typing import Optional, Dict, List, Any
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class MmpSaveData(BaseModel):
-    version: Optional[int] = None  # データバージョン
-    firstboot: Optional[str] = None  # 初回起動日時（UnixTime文字列）
-    lastsave: Optional[str] = None  # 最終保存日時（UnixTime文字列）
-    hide_record: Optional[int] = None  # ランキング公開設定（0=公開,1=非公開）
-    credit: Optional[int] = None  # 現在のメダル所持数
-    playtime: Optional[int] = None  # 総プレイ時間（秒）
-    credit_all: Optional[int] = None  # 累計メダル獲得数
+    version: int  # バージョン
+    firstboot: datetime  # 初回起動日時
+    lastsave: datetime  # 最終保存日時
+    hide_record: int  # ランキング非公開
+    credit: int  # 現在のメダル所持数
+    playtime: int  # 総プレイ時間（秒）
+    credit_all: int  # 累計メダル獲得数
     medal_in: Optional[int] = None  # メダル投入総数
     medal_get: Optional[int] = None  # メダル獲得総数
     ball_get: Optional[int] = None  # ボール獲得総数
@@ -70,6 +71,17 @@ class MmpSaveData(BaseModel):
 
     model_config = ConfigDict(extra="ignore")  # 未知フィールドは破棄する
 
+    @field_validator("firstboot", "lastsave", mode="before")
+    def convert_unix_to_datetime(cls, v: Any):
+        if not isinstance(v, (str, int)):
+            return None
+
+        try:
+            ts = int(v)
+            return datetime.fromtimestamp(ts, tz=timezone.utc)
+        except ValueError:
+            logging.warning(f"Invalid Unix timestamp: {v}")
+
     def model_dump_for_influx(self) -> dict:
         data = self.model_dump(exclude_none=True)
         flat = {}
@@ -93,7 +105,7 @@ class MmpSaveData(BaseModel):
 
 
 class MmpSaveRecord(BaseModel):
-    data: MmpSaveData # データ
+    data: MmpSaveData  # データ
     user_id: str  # ユーザー名
-    sig: str # シグネチャ
-    raw_url: str # 生のセーブURL
+    sig: str  # シグネチャ
+    raw_url: str  # 生のセーブURL
