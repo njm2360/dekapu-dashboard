@@ -46,6 +46,7 @@ class MmpSaveData(BaseModel):
     bstp_rwd: Optional[int] = None  # ボーナスステップ報酬回数
     buy_total: Optional[int] = None  # ショップ購入総額
     buy_shbi: Optional[int] = None  # シャルベ救出数
+    sp: Optional[int] = None  # SP所持数
     sp_use: Optional[int] = None  # SP使用数
     cpm_max: Optional[float] = None  # 獲得速度最大値
     palball_get: Optional[int] = None  # パレッタボール獲得数
@@ -67,7 +68,10 @@ class MmpSaveData(BaseModel):
     l_achieve: Optional[List[int]] = None  # 獲得済み実績一覧
 
     legacy: Optional[int] = None  # 旧仕様フラグ？
-    blackbox_credits: Optional[int] = None  # ブラックボックスクレジット(詳細不明)
+
+    bbox: Optional[int] = None  # 黒箱所有数
+    bbox_all: Optional[int] = None  # 黒箱獲得数
+    # blackbox_credits: Optional[int] = None  # 黒箱(Legacy)
 
     model_config = ConfigDict(extra="ignore")  # 未知フィールドは破棄する
 
