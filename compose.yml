@@ -16,7 +16,7 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_TOKEN}
 
   grafana:
-    image: grafana/grafana:12.2.0
+    image: grafana/grafana:12.2.1
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
