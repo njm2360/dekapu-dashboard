@@ -30,11 +30,13 @@ class MmpSaveData(BaseModel):
     pallot_lot_t1: Optional[int] = None  # パレッタ抽選（2段目）回数
     pallot_lot_t2: Optional[int] = None  # パレッタ抽選（3段目）回数
     pallot_lot_t3: Optional[int] = None  # パレッタ抽選（最終段）回数
+    pallot_lot_t4: Optional[int] = None  # パレッタ抽選（?????）回数
     jacksp_get_all: Optional[int] = None  # パレッタJACKPOT獲得回数
     jacksp_get_t0: Optional[int] = None  # シングルパレッタJACKPOT獲得回数
     jacksp_get_t1: Optional[int] = None  # ダブルパレッタJACKPOT獲得回数
     jacksp_get_t2: Optional[int] = None  # マッシブパレッタJACKPOT獲得回数
     jacksp_get_t3: Optional[int] = None  # へブンパレッタJACKPOT獲得回数
+    jacksp_get_t4: Optional[int] = None  # ????????????JACKPOT獲得回数
     jacksp_startmax: Optional[int] = None  # P-JPスタート値最高
     jacksp_totalmax: Optional[int] = None  # P-JP最終結果最高
     ult_get: Optional[int] = None  # アルティメット回数

@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 0,
   "links": [
     {
       "asDropdown": false,
@@ -1637,12 +1637,12 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"2段目\" }))",
-          "refId": "C"
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"2段目\" }))",
+          "refId": "A"
         },
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"3段目\" }))",
-          "refId": "A"
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"3段目\" }))",
+          "refId": "B"
         },
         {
           "datasource": {
@@ -1650,8 +1650,17 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"最終段\" }))",
-          "refId": "B"
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"最終段\" }))",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t4\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"?段目\" }))\r\n",
+          "refId": "D"
         }
       ],
       "title": "パレッタチャンス挑戦回数",
@@ -1949,11 +1958,11 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"シングル\" }))",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"シングル\" }))",
           "refId": "C"
         },
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ダブル\" }))",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t1\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ダブル\" }))",
           "refId": "A"
         },
         {
@@ -1962,7 +1971,7 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"マッシブ\" }))",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"マッシブ\" }))",
           "refId": "B"
         },
         {
@@ -1971,8 +1980,17 @@
             "uid": "beyps6l9ombk0e"
           },
           "hide": false,
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ヘブン\" }))",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"ヘブン\" }))",
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t4\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> drop(columns: [\"user\", \"_measurement\"])\r\n  |> map(fn: (r) => ({ r with _field: \"???\" }))",
+          "refId": "E"
         }
       ],
       "title": "パレッタJACKPOT種別",
@@ -2063,7 +2081,7 @@
       "pluginVersion": "12.2.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> filter(fn: (r) => r._field == \"palball_get\" or r._field == \"pallot_lot_t0\")\r\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _value: r.palball_get - r.pallot_lot_t0\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"difference\")\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> filter(fn: (r) => r._field == \"palball_get\" or r._field == \"pallot_lot_t0\")\r\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _value: r.palball_get - r.pallot_lot_t0\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\r\n  |> yield(name: \"difference\")\r\n",
           "refId": "A"
         }
       ],
@@ -2325,6 +2343,15 @@
           "hide": false,
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t3\" or r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _measurement: \"ヘブン\",\r\n      _value: if exists r.pallot_lot_t0 and r.pallot_lot_t0 != 0.0 then float(v: r.jacksp_get_t3) / float(v: r.pallot_lot_t0) else 0.0\r\n    }))\r\n",
           "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "hide": false,
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_t4\" or r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _measurement: \"???\",\r\n      _value: if exists r.pallot_lot_t0 and r.pallot_lot_t0 != 0.0 then float(v: r.jacksp_get_t4) / float(v: r.pallot_lot_t0) else 0.0\r\n    }))\r\n",
+          "refId": "E"
         }
       ],
       "title": "パレッタJACKPOT当選率",
@@ -4774,5 +4801,5 @@
   "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 77
+  "version": 85
 }
