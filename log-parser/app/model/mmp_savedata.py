@@ -75,7 +75,7 @@ class MmpSaveData(BaseModel):
     bbox_all: Optional[int] = None  # 黒箱獲得数
     # blackbox_credits: Optional[int] = None  # 黒箱(Legacy)
 
-    model_config = ConfigDict(extra="ignore")  # 未知フィールドは破棄する
+    model_config = ConfigDict(extra="ignore", strict=True)  # 未知フィールドは破棄する
 
     @field_validator("credit", "credit_all", mode="before")
     def convert_str_to_int(cls, v: Any):
