@@ -98,6 +98,21 @@ class MmpSaveData(BaseModel):
         except ValueError:
             logging.warning(f"Invalid Unix timestamp: {v}")
 
+    @field_validator(
+        "dc_medal_get",
+        "dc_ball_get",
+        "dc_ball_chain",
+        "dc_palball_get",
+        "dc_palball_jp",
+        mode="before",
+    )
+    def remove_null_field(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, dict):
+            return {k: val for k, val in v.items() if val is not None}
+        return v
+
     def model_dump_for_influx(self) -> dict:
         data = self.model_dump(exclude_none=True)
         flat = {}
