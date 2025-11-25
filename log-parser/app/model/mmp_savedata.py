@@ -77,6 +77,16 @@ class MmpSaveData(BaseModel):
 
     model_config = ConfigDict(extra="ignore")  # 未知フィールドは破棄する
 
+    @field_validator("credit", "credit_all", mode="before")
+    def convert_str_to_int(cls, v: Any):
+        if not isinstance(v, (str, int)):
+            return None
+
+        try:
+            return int(v)
+        except ValueError:
+            logging.warning(f"Invalid value: {v}")
+
     @field_validator("firstboot", "lastsave", mode="before")
     def convert_unix_to_datetime(cls, v: Any):
         if not isinstance(v, (str, int)):
