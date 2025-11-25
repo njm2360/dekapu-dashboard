@@ -113,6 +113,21 @@ class MmpSaveData(BaseModel):
             return {k: val for k, val in v.items() if val is not None}
         return v
 
+    # プレイ時間で増えてINTを超える可能性があるものは全て補完処理掛ける
+    @field_validator(
+        "medal_in",
+        "ult_get",
+        "rmshbi_get",
+        "buy_shbi",
+        "buy_total",
+        mode="before",
+    )
+    def fix_overflow(cls, v):
+        if ｖ < 0:
+            mask = (1 << 32) - 1
+            return v & mask
+        return v
+
     def model_dump_for_influx(self) -> dict:
         data = self.model_dump(exclude_none=True)
         flat = {}
