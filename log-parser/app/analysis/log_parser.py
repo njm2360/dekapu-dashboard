@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from urllib.parse import urlparse, parse_qs, unquote
 
 from app.model.mmp_savedata import MmpSaveData, MmpSaveRecord
+from app.utils.base64_util import b64_urlsafe_decode
 
 
 class Event(Enum):
@@ -30,7 +31,7 @@ class ParseResult:
 class MmpLogParser:
     DEKAPU_WORLD_ID: Final[str] = "wrld_1af53798-92a3-4c3f-99ae-a7c42ec6084d"
 
-    SAVEDATA_URL_PATTERN = re.compile(r"https://push\.trap\.games/api/v\d+/data")
+    SAVEDATA_URL_PATTERN = re.compile(r"https://push\.trap\.games/api/v(\d+)/data")
 
     CLOUD_LOAD_MSG: Final[str] = "[LoadFromParsedData]"
     SESSION_RESET_MSG: Final[str] = "[ResetCurrentSession]"
@@ -53,6 +54,42 @@ class MmpLogParser:
         except ValueError as e:
             logging.warning(f"[{self.fname}] Failed to parse JP stockover '{raw}': {e}")
             return None
+
+    def _parse_savedata_line(self, line: str, version: int) -> Optional[MmpSaveRecord]:
+        parsed = urlparse(line)
+        query = parse_qs(parsed.query)
+
+        def get_and_decode(name: str) -> Optional[str]:
+            raw = self._get_query_param(query, name)
+            if not raw:
+                return None
+            if version == 4:
+                return b64_urlsafe_decode(raw).decode("utf-8")
+            return raw
+
+        data_str = get_and_decode("data")
+        user_id = get_and_decode("user_id")
+        sig = self._get_query_param(query, "sig")
+
+        if not (data_str and user_id and sig):
+            return None
+
+        try:
+            raw_dict: dict[str, any] = json.loads(data_str)
+            verified_data = MmpSaveData(**raw_dict)
+        except ValidationError as e:
+            logging.warning(f"[{self.fname}] Save data validation error: {e}")
+            return None
+        except json.JSONDecodeError as e:
+            logging.warning(f"[{self.fname}] JSON decode error: {e}")
+            return None
+
+        return MmpSaveRecord(
+            data=verified_data,
+            user_id=user_id,
+            sig=sig,
+            raw_url=line,
+        )
 
     def parse_line(self, line: str) -> Optional[ParseResult]:
         try:
@@ -84,43 +121,15 @@ class MmpLogParser:
                 return ParseResult(event=Event.VRCHAT_APP_QUIT)
 
             # セーブデータ行の解析
-            if self.SAVEDATA_URL_PATTERN.search(line):
-                parsed = urlparse(line)
-                query = parse_qs(parsed.query)
-
-                raw_data = self._get_query_param(query, "data")
-                if not raw_data:
-                    return None
-
-                user_id = self._get_query_param(query, "user_id")
-                if not user_id:
-                    return None
-
-                sig = self._get_query_param(query, "sig")
-                if not sig:
-                    return None
-
-                try:
-                    raw_dict: dict[str, any] = json.loads(raw_data)
-                    data = MmpSaveData(**raw_dict)
-                except ValidationError as e:
-                    logging.warning(f"[{self.fname}] Save data validation error: {e}")
-                    return None
-                except json.JSONDecodeError as e:
-                    logging.warning(f"[{self.fname}] JSON decode error: {e}")
-                    return None
-
-                return ParseResult(
-                    event=Event.DEKAPU_SAVEDATA_UPDATE,
-                    record=MmpSaveRecord(
-                        data=data,
-                        user_id=user_id,
-                        sig=sig,
-                        raw_url=line,
-                    ),
-                )
-
-            return None
+            savedata_match = re.match(self.SAVEDATA_URL_PATTERN, line)
+            if savedata_match:
+                version = int(savedata_match.group(1))
+                record = self._parse_savedata_line(line, version)
+                if record:
+                    return ParseResult(
+                        event=Event.DEKAPU_SAVEDATA_UPDATE,
+                        record=record,
+                    )
 
         except Exception as e:
             logging.exception(f"[{self.fname}] Unexpected parser error: {e}")
