@@ -75,7 +75,7 @@ class MmpSaveData(BaseModel):
     bbox_all: Optional[int] = None  # 黒箱獲得数
     # blackbox_credits: Optional[int] = None  # 黒箱(Legacy)
 
-    model_config = ConfigDict(extra="ignore")  # 未知フィールドは破棄する
+    model_config = ConfigDict(extra="ignore", strict=True)  # 未知フィールドは破棄する
 
     @field_validator("credit", "credit_all", mode="before")
     def convert_str_to_int(cls, v: Any):
@@ -97,6 +97,36 @@ class MmpSaveData(BaseModel):
             return datetime.fromtimestamp(ts, tz=timezone.utc)
         except ValueError:
             logging.warning(f"Invalid Unix timestamp: {v}")
+
+    @field_validator(
+        "dc_medal_get",
+        "dc_ball_get",
+        "dc_ball_chain",
+        "dc_palball_get",
+        "dc_palball_jp",
+        mode="before",
+    )
+    def remove_null_field(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, dict):
+            return {k: val for k, val in v.items() if val is not None}
+        return v
+
+    # プレイ時間で増えてINTを超える可能性があるものは全て補完処理掛ける
+    @field_validator(
+        "medal_in",
+        "ult_get",
+        "rmshbi_get",
+        "buy_shbi",
+        "buy_total",
+        mode="before",
+    )
+    def fix_overflow(cls, v):
+        if ｖ < 0:
+            mask = (1 << 32) - 1
+            return v & mask
+        return v
 
     def model_dump_for_influx(self) -> dict:
         data = self.model_dump(exclude_none=True)
