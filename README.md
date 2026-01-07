@@ -7,7 +7,7 @@
 以下のコマンドを`ファイル名を指定して実行`に貼り付けて実行してください。(スタートボタンを右クリック -> `ファイル名を指定して実行`)
 
 ```bash
-powershell -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1 | iex
+powershell -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/njm2360/dekapu-dashboard/main/install.ps1 | iex"
 ```
 
 【注意】
