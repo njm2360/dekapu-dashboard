@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 0,
   "links": [
     {
       "asDropdown": false,
@@ -69,7 +69,7 @@
         "content": "# Statistics",
         "mode": "markdown"
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -95,7 +95,7 @@
         "content": "# Medals",
         "mode": "markdown"
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -121,7 +121,7 @@
         "content": "# Skill Points (SP)",
         "mode": "markdown"
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -175,7 +175,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -267,7 +267,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)\r\n",
@@ -359,10 +359,10 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"buy_total\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sp_use\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)\r\n",
           "refId": "A"
         }
       ],
@@ -418,7 +418,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: -5h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n  |> last()",
@@ -477,7 +477,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"credit\")\r\n  |> filter(fn: (r) => r[\"user\"] == \"${user}\")\r\n  |> last()\r\n",
@@ -566,7 +566,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -655,7 +655,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sp_use\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -713,7 +713,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"playtime\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -771,7 +771,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "import \"math\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"cpm_max\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: float(v: math.floor(x: r._value))\r\n      }))\r\n",
@@ -829,7 +829,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_start\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -887,7 +887,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_getfev\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -945,7 +945,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_hit\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1003,7 +1003,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"slot_startfev\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1187,7 +1187,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"bstp_rwd\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1245,7 +1245,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sp_use\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1303,7 +1303,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"l_achieve_count\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1361,7 +1361,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1420,7 +1420,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"buy_shbi\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1479,7 +1479,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"bbox_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1538,7 +1538,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"rmshbi_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1597,7 +1597,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\" or r._field == \"bbox_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if exists r.task_cnt and r.task_cnt != 0.0 \r\n              then float(v: r.bbox_all) / float(v: r.task_cnt) \r\n              else 0.0\r\n    }))\r\n",
@@ -1700,7 +1700,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all_delta_1m\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -1798,7 +1798,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "12.2.1",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"rmshbi_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -1846,7 +1846,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 253
+            "y": 43
           },
           "id": 21,
           "options": {
@@ -1866,7 +1866,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_startmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1904,7 +1904,7 @@
             "h": 3,
             "w": 4,
             "x": 4,
-            "y": 253
+            "y": 43
           },
           "id": 28,
           "options": {
@@ -1924,7 +1924,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_startmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -1962,7 +1962,7 @@
             "h": 3,
             "w": 4,
             "x": 8,
-            "y": 253
+            "y": 43
           },
           "id": 46,
           "options": {
@@ -1982,7 +1982,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2020,7 +2020,7 @@
             "h": 3,
             "w": 7,
             "x": 12,
-            "y": 253
+            "y": 43
           },
           "id": 14,
           "options": {
@@ -2040,7 +2040,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "datasource": {
@@ -2109,7 +2109,7 @@
             "h": 3,
             "w": 5,
             "x": 19,
-            "y": 253
+            "y": 43
           },
           "id": 69,
           "options": {
@@ -2129,7 +2129,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "jacksp = from(bucket: \"dekapu-log\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> rename(columns: {_value: \"jacksp_value\"})\r\n\r\npallot = from(bucket: \"dekapu-log\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> rename(columns: {_value: \"pallot_value\"})\r\n\r\njoin(tables: {jacksp: jacksp, pallot: pallot}, on: [\"user\"])\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if exists r.pallot_value and r.pallot_value != 0.0\r\n              then float(v: r.jacksp_value) / float(v: r.pallot_value)\r\n              else 0.0,\r\n  }))\r\n",
@@ -2167,7 +2167,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 256
+            "y": 46
           },
           "id": 22,
           "options": {
@@ -2187,7 +2187,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_totalmax_v2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2225,7 +2225,7 @@
             "h": 3,
             "w": 4,
             "x": 4,
-            "y": 256
+            "y": 46
           },
           "id": 29,
           "options": {
@@ -2245,7 +2245,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_totalmax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2283,7 +2283,7 @@
             "h": 3,
             "w": 4,
             "x": 8,
-            "y": 256
+            "y": 46
           },
           "id": 62,
           "options": {
@@ -2303,7 +2303,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_palball_get_100\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2341,7 +2341,7 @@
             "h": 3,
             "w": 7,
             "x": 12,
-            "y": 256
+            "y": 46
           },
           "id": 16,
           "options": {
@@ -2361,7 +2361,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "datasource": {
@@ -2473,7 +2473,7 @@
             "h": 6,
             "w": 5,
             "x": 19,
-            "y": 256
+            "y": 46
           },
           "id": 76,
           "options": {
@@ -2489,7 +2489,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> filter(fn: (r) => r._field == \"palball_get\" or r._field == \"pallot_lot_t0\")\r\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _value: r.palball_get - r.pallot_lot_t0\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_value\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\r\n  |> yield(name: \"difference\")\r\n",
@@ -2527,7 +2527,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 259
+            "y": 49
           },
           "id": 39,
           "options": {
@@ -2547,7 +2547,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2585,7 +2585,7 @@
             "h": 3,
             "w": 4,
             "x": 4,
-            "y": 259
+            "y": 49
           },
           "id": 15,
           "options": {
@@ -2605,7 +2605,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -2644,7 +2644,7 @@
             "h": 3,
             "w": 4,
             "x": 8,
-            "y": 259
+            "y": 49
           },
           "id": 10,
           "options": {
@@ -2664,7 +2664,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_palball_get_100\" or r._field == \"pallot_lot_t0\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if exists r.pallot_lot_t0 and r.pallot_lot_t0 != 0.0 \r\n              then float(v: r.dc_palball_get_100) / float(v: r.pallot_lot_t0) \r\n              else 0.0\r\n    }))\r\n",
@@ -2702,7 +2702,7 @@
             "h": 3,
             "w": 7,
             "x": 12,
-            "y": 259
+            "y": 49
           },
           "id": 61,
           "options": {
@@ -2722,7 +2722,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "datasource": {
@@ -2846,7 +2846,7 @@
             "h": 8,
             "w": 10,
             "x": 0,
-            "y": 262
+            "y": 52
           },
           "id": 68,
           "options": {
@@ -2862,7 +2862,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "jacksp = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"jacksp_get_all\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({r with _field: \"PJP獲得数\"}))\r\n\r\npallot = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"pallot_lot_t0\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({r with _field: \"ボール獲得数\"}))\r\n\r\nratio = join(\r\n    tables: {jacksp: jacksp, pallot: pallot},\r\n    on: [\"_time\"]\r\n  )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: \"PJP当選率\",\r\n      _value: if exists r._value_pallot and r._value_pallot != 0.0\r\n              then float(v: r._value_jacksp) / float(v: r._value_pallot)\r\n              else 0.0\r\n  }))\r\n\r\nunion(tables: [jacksp, pallot, ratio])\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> yield(name: \"PJP当選率\")\r\n",
@@ -2953,7 +2953,7 @@
             "h": 8,
             "w": 7,
             "x": 10,
-            "y": 262
+            "y": 52
           },
           "id": 41,
           "options": {
@@ -2969,7 +2969,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
@@ -3045,7 +3045,7 @@
             "h": 8,
             "w": 7,
             "x": 17,
-            "y": 262
+            "y": 52
           },
           "id": 30,
           "options": {
@@ -3061,7 +3061,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jacksp_get_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
@@ -3113,7 +3113,7 @@
             "h": 3,
             "w": 3,
             "x": 0,
-            "y": 271
+            "y": 44
           },
           "id": 63,
           "options": {
@@ -3133,7 +3133,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -3171,7 +3171,7 @@
             "h": 3,
             "w": 3,
             "x": 3,
-            "y": 271
+            "y": 44
           },
           "id": 25,
           "options": {
@@ -3191,7 +3191,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -3256,7 +3256,7 @@
             "h": 9,
             "w": 5,
             "x": 6,
-            "y": 271
+            "y": 44
           },
           "id": 65,
           "options": {
@@ -3281,7 +3281,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_step\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -3345,7 +3345,7 @@
             "h": 9,
             "w": 5,
             "x": 11,
-            "y": 271
+            "y": 44
           },
           "id": 67,
           "options": {
@@ -3370,7 +3370,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "sqr = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_step\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> rename(columns: {_value: \"sqr_step\"})\r\n\r\njack = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> rename(columns: {_value: \"jack_get\"})\r\n\r\njoin(tables: {sqr: sqr, jack: jack}, on: [\"_time\"])\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if r.jack_get > 0.0 \r\n              then float(v: r.sqr_step) / (float(v: r.jack_get) * 16.0) \r\n              else 0.0\r\n    }))\r\n",
@@ -3467,7 +3467,7 @@
             "h": 9,
             "w": 8,
             "x": 16,
-            "y": 271
+            "y": 44
           },
           "id": 31,
           "options": {
@@ -3483,7 +3483,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
@@ -3531,7 +3531,7 @@
             "h": 3,
             "w": 3,
             "x": 0,
-            "y": 274
+            "y": 47
           },
           "id": 64,
           "options": {
@@ -3551,7 +3551,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_step\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -3589,7 +3589,7 @@
             "h": 3,
             "w": 3,
             "x": 3,
-            "y": 274
+            "y": 47
           },
           "id": 26,
           "options": {
@@ -3609,7 +3609,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_combomax\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -3648,7 +3648,7 @@
             "h": 3,
             "w": 3,
             "x": 0,
-            "y": 277
+            "y": 50
           },
           "id": 66,
           "options": {
@@ -3668,7 +3668,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"sqr_step\" or r._field == \"jack_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> pivot(\r\n      rowKey:[\"_time\"],\r\n      columnKey:[\"_field\"],\r\n      valueColumn:\"_value\"\r\n    )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: if exists r.jack_get and r.jack_get > 0.0 \r\n              then float(v: r.sqr_step) / (float(v: r.jack_get) * 16.0) \r\n              else 0.0\r\n    }))\r\n",
@@ -3706,7 +3706,7 @@
             "h": 3,
             "w": 3,
             "x": 3,
-            "y": 277
+            "y": 50
           },
           "id": 27,
           "options": {
@@ -3726,7 +3726,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ult_totalmax_v2\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -3781,7 +3781,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 114
+            "y": 45
           },
           "id": 72,
           "options": {
@@ -3801,7 +3801,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "datasource": {
@@ -3937,7 +3937,7 @@
             "h": 8,
             "w": 16,
             "x": 8,
-            "y": 114
+            "y": 45
           },
           "id": 71,
           "options": {
@@ -3957,7 +3957,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "datasource": {
@@ -4097,7 +4097,7 @@
             "h": 10,
             "w": 16,
             "x": 8,
-            "y": 122
+            "y": 53
           },
           "id": 88,
           "options": {
@@ -4113,7 +4113,7 @@
               "sort": "desc"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"date\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"credit_all\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 10m, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      time: r._time,\r\n      \"Medals Aqcuired\": r._value,\r\n  }))\r\n",
@@ -4174,7 +4174,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 300
+            "y": 46
           },
           "id": 9,
           "options": {
@@ -4194,7 +4194,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -4708,7 +4708,7 @@
             "h": 10,
             "w": 10,
             "x": 4,
-            "y": 300
+            "y": 46
           },
           "id": 44,
           "options": {
@@ -4733,7 +4733,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"Normal\"\r\n          else if r._field == \"dc_ball_get_1\" then \"Orange\"\r\n          else if r._field == \"dc_ball_get_2\" then \"Green\"\r\n          else if r._field == \"dc_ball_get_3\" then \"Rainbow\"\r\n          else if r._field == \"dc_ball_get_4\" then \"Pink\"\r\n          else if r._field == \"dc_ball_get_5\" then \"Purple\"\r\n          else if r._field == \"dc_ball_get_6\" then \"White\"\r\n          else if r._field == \"dc_ball_get_7\" then \"Cyan\"\r\n          else if r._field == \"dc_ball_get_8\" then \"Pale Pink\"\r\n          else if r._field == \"dc_ball_get_9\" then \"Navy\"\r\n          else if r._field == \"dc_ball_get_10\" then \"Red\"\r\n          else if r._field == \"dc_ball_get_11\" then \"Cream\"\r\n          else if r._field == \"dc_ball_get_12\" then \"Mint\"\r\n          else if r._field == \"dc_ball_get_13\" then \"Peach\"\r\n          else if r._field == \"dc_ball_get_14\" then \"Starry\"\r\n          else if r._field == \"dc_ball_get_15\" then \"Meadow\"\r\n          else if r._field == \"dc_ball_get_16\" then \"Black\"\r\n          else if r._field == \"dc_ball_get_17\" then \"Yellow\"\r\n          else if r._field == \"dc_ball_get_18\" then \"Lavender\"\r\n          else if r._field == \"dc_ball_get_19\" then \"Lime\"\r\n          else if r._field == \"dc_ball_get_90\" then \"Dead Sherbi (??)\"\r\n          else if r._field == \"dc_ball_get_91\" then \"Unknown Currency\"\r\n          else if r._field == \"dc_ball_get_100\" then \"Golden\"\r\n          else if r._field == \"dc_ball_get_101\" then \"Amethyst\"\r\n          else if r._field == \"dc_ball_get_102\" then \"Emerald\"\r\n          else if r._field == \"dc_ball_get_103\" then \"Rose Quartz\"\r\n          else if r._field == \"dc_ball_get_104\" then \"Topaz\"\r\n          else if r._field == \"dc_ball_get_105\" then \"Sapphire\"\r\n          else if r._field == \"dc_ball_get_334\" then \"Lottery\"\r\n          else if r._field == \"dc_ball_get_335\" then \"Lottery (Special)\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
@@ -5245,7 +5245,7 @@
             "h": 10,
             "w": 10,
             "x": 14,
-            "y": 300
+            "y": 46
           },
           "id": 42,
           "options": {
@@ -5271,7 +5271,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"Normal\"\r\n          else if r._field == \"dc_ball_get_1\" then \"Orange\"\r\n          else if r._field == \"dc_ball_get_2\" then \"Green\"\r\n          else if r._field == \"dc_ball_get_3\" then \"Rainbow\"\r\n          else if r._field == \"dc_ball_get_4\" then \"Pink\"\r\n          else if r._field == \"dc_ball_get_5\" then \"Purple\"\r\n          else if r._field == \"dc_ball_get_6\" then \"White\"\r\n          else if r._field == \"dc_ball_get_7\" then \"Cyan\"\r\n          else if r._field == \"dc_ball_get_8\" then \"Pale Pink\"\r\n          else if r._field == \"dc_ball_get_9\" then \"Navy\"\r\n          else if r._field == \"dc_ball_get_10\" then \"Red\"\r\n          else if r._field == \"dc_ball_get_11\" then \"Cream\"\r\n          else if r._field == \"dc_ball_get_12\" then \"Mint\"\r\n          else if r._field == \"dc_ball_get_13\" then \"Peach\"\r\n          else if r._field == \"dc_ball_get_14\" then \"Starry\"\r\n          else if r._field == \"dc_ball_get_15\" then \"Meadow\"\r\n          else if r._field == \"dc_ball_get_16\" then \"Black\"\r\n          else if r._field == \"dc_ball_get_17\" then \"Yellow\"\r\n          else if r._field == \"dc_ball_get_18\" then \"Lavender\"\r\n          else if r._field == \"dc_ball_get_19\" then \"Lime\"\r\n          else if r._field == \"dc_ball_get_90\" then \"Dead Sherbi (??)\"\r\n          else if r._field == \"dc_ball_get_91\" then \"Unknown Currency\"\r\n          else if r._field == \"dc_ball_get_100\" then \"Golden\"\r\n          else if r._field == \"dc_ball_get_101\" then \"Amethyst\"\r\n          else if r._field == \"dc_ball_get_102\" then \"Emerald\"\r\n          else if r._field == \"dc_ball_get_103\" then \"Rose Quartz\"\r\n          else if r._field == \"dc_ball_get_104\" then \"Topaz\"\r\n          else if r._field == \"dc_ball_get_105\" then \"Sapphire\"\r\n          else if r._field == \"dc_ball_get_334\" then \"Lottery\"\r\n          else if r._field == \"dc_ball_get_335\" then \"Lottery (Special)\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n  \r\n",
@@ -5745,7 +5745,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 303
+            "y": 49
           },
           "id": 52,
           "options": {
@@ -5765,7 +5765,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_chain\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -6277,7 +6277,7 @@
             "h": 7,
             "w": 4,
             "x": 0,
-            "y": 306
+            "y": 52
           },
           "id": 33,
           "options": {
@@ -6293,7 +6293,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ball_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
@@ -6331,7 +6331,7 @@
             "h": 7,
             "w": 10,
             "x": 4,
-            "y": 310
+            "y": 56
           },
           "id": 47,
           "options": {
@@ -6352,7 +6352,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_get_0\" then \"Normal\"\r\n          else if r._field == \"dc_ball_get_1\" then \"Orange\"\r\n          else if r._field == \"dc_ball_get_2\" then \"Green\"\r\n          else if r._field == \"dc_ball_get_3\" then \"Rainbow\"\r\n          else if r._field == \"dc_ball_get_4\" then \"Pink\"\r\n          else if r._field == \"dc_ball_get_5\" then \"Purple\"\r\n          else if r._field == \"dc_ball_get_6\" then \"White\"\r\n          else if r._field == \"dc_ball_get_7\" then \"Cyan\"\r\n          else if r._field == \"dc_ball_get_8\" then \"Pale Pink\"\r\n          else if r._field == \"dc_ball_get_9\" then \"Navy\"\r\n          else if r._field == \"dc_ball_get_10\" then \"Red\"\r\n          else if r._field == \"dc_ball_get_11\" then \"Cream\"\r\n          else if r._field == \"dc_ball_get_12\" then \"Mint\"\r\n          else if r._field == \"dc_ball_get_13\" then \"Peach\"\r\n          else if r._field == \"dc_ball_get_14\" then \"Starry\"\r\n          else if r._field == \"dc_ball_get_15\" then \"Meadow\"\r\n          else if r._field == \"dc_ball_get_16\" then \"Black\"\r\n          else if r._field == \"dc_ball_get_17\" then \"Yellow\"\r\n          else if r._field == \"dc_ball_get_18\" then \"Lavender\"\r\n          else if r._field == \"dc_ball_get_19\" then \"Lime\"\r\n          else if r._field == \"dc_ball_get_90\" then \"Dead Sherbi (??)\"\r\n          else if r._field == \"dc_ball_get_91\" then \"Unknown Currency\"\r\n          else if r._field == \"dc_ball_get_100\" then \"Golden\"\r\n          else if r._field == \"dc_ball_get_101\" then \"Amethyst\"\r\n          else if r._field == \"dc_ball_get_102\" then \"Emerald\"\r\n          else if r._field == \"dc_ball_get_103\" then \"Rose Quartz\"\r\n          else if r._field == \"dc_ball_get_104\" then \"Topaz\"\r\n          else if r._field == \"dc_ball_get_105\" then \"Sapphire\"\r\n          else if r._field == \"dc_ball_get_334\" then \"Lottery\"\r\n          else if r._field == \"dc_ball_get_335\" then \"Lottery (Special)\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
@@ -6395,7 +6395,7 @@
             "h": 14,
             "w": 10,
             "x": 14,
-            "y": 310
+            "y": 56
           },
           "id": 59,
           "options": {
@@ -6415,7 +6415,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"timezone\"\r\nimport \"strings\"\r\n\r\noption location = timezone.location(name: \"Asia/Tokyo\")\r\n\r\nball = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field == \"ball_get\" and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: -5h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\nballs = from(bucket: \"dekapu-log\")\r\n  |> range(start: -2d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\" and r._field =~ /^dc_ball_get_/ and r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1d, offset: -5h, fn: last, createEmpty: false)\r\n  |> difference(nonNegative: true)\r\n\r\njoin(\r\n  tables: {balls: balls, ball: ball},\r\n  on: [\"_time\"],\r\n)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _value: if r._value_ball == 0.0 then 0.0 else float(v: r._value_balls) / float(v: r._value_ball) * 100.0\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field_balls\", \"_value\"])\r\n  |> difference(nonNegative: false, columns: [\"_value\"])\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field_balls:\r\n          if r._field_balls == \"dc_ball_get_0\" then \"Normal\"\r\n          else if r._field_balls == \"dc_ball_get_1\" then \"Orange\"\r\n          else if r._field_balls == \"dc_ball_get_2\" then \"Green\"\r\n          else if r._field_balls == \"dc_ball_get_3\" then \"Rainbow\"\r\n          else if r._field_balls == \"dc_ball_get_4\" then \"Pink\"\r\n          else if r._field_balls == \"dc_ball_get_5\" then \"Purple\"\r\n          else if r._field_balls == \"dc_ball_get_6\" then \"White\"\r\n          else if r._field_balls == \"dc_ball_get_7\" then \"Cyan\"\r\n          else if r._field_balls == \"dc_ball_get_8\" then \"Pale Pink\"\r\n          else if r._field_balls == \"dc_ball_get_9\" then \"Navy\"\r\n          else if r._field_balls == \"dc_ball_get_10\" then \"Red\"\r\n          else if r._field_balls == \"dc_ball_get_11\" then \"Cream\"\r\n          else if r._field_balls == \"dc_ball_get_12\" then \"Mint\"\r\n          else if r._field_balls == \"dc_ball_get_13\" then \"Peach\"\r\n          else if r._field_balls == \"dc_ball_get_14\" then \"Starry\"\r\n          else if r._field_balls == \"dc_ball_get_15\" then \"Meadow\"\r\n          else if r._field_balls == \"dc_ball_get_16\" then \"Black\"\r\n          else if r._field_balls == \"dc_ball_get_17\" then \"Yellow\"\r\n          else if r._field_balls == \"dc_ball_get_18\" then \"Lavender\"\r\n          else if r._field_balls == \"dc_ball_get_19\" then \"Lime\"\r\n          else if r._field_balls == \"dc_ball_get_90\" then \"Dead Sherbi (??)\"\r\n          else if r._field_balls == \"dc_ball_get_100\" then \"Golden\"\r\n          else if r._field_balls == \"dc_ball_get_101\" then \"Amethyst\"\r\n          else if r._field_balls == \"dc_ball_get_102\" then \"Emerald\"\r\n          else if r._field_balls == \"dc_ball_get_103\" then \"Rose Quartz\"\r\n          else if r._field_balls == \"dc_ball_get_104\" then \"Topaz\"\r\n          else if r._field_balls == \"dc_ball_get_105\" then \"Sapphire\"\r\n          else if r._field_balls == \"dc_ball_get_334\" then \"Lottery\"\r\n          else if r._field_balls == \"dc_ball_get_335\" then \"Lottery (Special)\"\r\n          else strings.replace(v: r._field_balls, t: \"dc_ball_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n",
@@ -6453,7 +6453,7 @@
             "h": 7,
             "w": 10,
             "x": 4,
-            "y": 317
+            "y": 63
           },
           "id": 48,
           "options": {
@@ -6476,7 +6476,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_ball_chain_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n          if r._field == \"dc_ball_chain_0\" then \"Normal\"\r\n          else if r._field == \"dc_ball_chain_1\" then \"Orange\"\r\n          else if r._field == \"dc_ball_chain_2\" then \"Green\"\r\n          else if r._field == \"dc_ball_chain_3\" then \"Rainbow\"\r\n          else if r._field == \"dc_ball_chain_4\" then \"Pink\"\r\n          else if r._field == \"dc_ball_chain_5\" then \"Purple\"\r\n          else if r._field == \"dc_ball_chain_6\" then \"White\"\r\n          else if r._field == \"dc_ball_chain_7\" then \"Cyan\"\r\n          else if r._field == \"dc_ball_chain_8\" then \"Pale Pink\"\r\n          else if r._field == \"dc_ball_chain_9\" then \"Navy\"\r\n          else if r._field == \"dc_ball_chain_10\" then \"Red\"\r\n          else if r._field == \"dc_ball_chain_11\" then \"Cream\"\r\n          else if r._field == \"dc_ball_chain_12\" then \"Mint\"\r\n          else if r._field == \"dc_ball_chain_13\" then \"Peach\"\r\n          else if r._field == \"dc_ball_chain_14\" then \"Starry\"\r\n          else if r._field == \"dc_ball_chain_15\" then \"Meadow\"\r\n          else if r._field == \"dc_ball_chain_16\" then \"Black\"\r\n          else if r._field == \"dc_ball_chain_17\" then \"Yellow\"\r\n          else if r._field == \"dc_ball_chain_18\" then \"Lavender\"\r\n          else if r._field == \"dc_ball_chain_19\" then \"Lime\"\r\n          else if r._field == \"dc_ball_chain_90\" then \"Dead Sherbi (??)\"\r\n          else if r._field == \"dc_ball_chain_100\" then \"Golden\"\r\n          else if r._field == \"dc_ball_chain_101\" then \"Amethyst\"\r\n          else if r._field == \"dc_ball_chain_102\" then \"Emerald\"\r\n          else if r._field == \"dc_ball_chain_103\" then \"Rose Quartz\"\r\n          else if r._field == \"dc_ball_chain_104\" then \"Topaz\"\r\n          else if r._field == \"dc_ball_chain_105\" then \"Sapphire\"\r\n          else if r._field == \"dc_ball_chain_334\" then \"Lottery\"\r\n          else if r._field == \"dc_ball_chain_335\" then \"Lottery (Special)\"\r\n          else strings.replace(v: r._field, t: \"dc_ball_chain_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
@@ -6964,7 +6964,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 325
+            "y": 115
           },
           "id": 8,
           "options": {
@@ -6984,7 +6984,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -7389,7 +7389,7 @@
             "h": 10,
             "w": 10,
             "x": 4,
-            "y": 325
+            "y": 115
           },
           "id": 34,
           "options": {
@@ -7415,7 +7415,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"Normal\"\r\n        else if r._field == \"dc_medal_get_1\" then \"Orange (Roulette)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"Green\"\r\n        else if r._field == \"dc_medal_get_3\" then \"Pink\"\r\n        else if r._field == \"dc_medal_get_4\" then \"Purple\"\r\n        else if r._field == \"dc_medal_get_5\" then \"Cyan\"\r\n        else if r._field == \"dc_medal_get_6\" then \"Wall Medal\"\r\n        else if r._field == \"dc_medal_get_7\" then \"SP Medal\"\r\n        else if r._field == \"dc_medal_get_12\" then \"Green x10\"\r\n        else if r._field == \"dc_medal_get_13\" then \"Pink x10\"\r\n        else if r._field == \"dc_medal_get_14\" then \"Purple x10\"\r\n        else if r._field == \"dc_medal_get_15\" then \"Gold\"\r\n        else if r._field == \"dc_medal_get_16\" then \"Gold Bar\"\r\n        else if r._field == \"dc_medal_get_17\" then \"Gold Bar x10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"Large Gold\"\r\n        else if r._field == \"dc_medal_get_19\" then \"Large Gold x10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"Large Gold x100\"\r\n        else if r._field == \"dc_medal_get_21\" then \"Unknown Currency\"\r\n        else if r._field == \"dc_medal_get_100\" then \"Rainbow\"\r\n        else if r._field == \"dc_medal_get_101\" then \"Gold (Bot Frame)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"Sapphire\"\r\n        else if r._field == \"dc_medal_get_103\" then \"Ruby\"\r\n        else if r._field == \"dc_medal_get_104\" then \"Emerald\"\r\n        else if r._field == \"dc_medal_get_105\" then \"Diamond\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\n",
@@ -7824,7 +7824,7 @@
             "h": 10,
             "w": 10,
             "x": 14,
-            "y": 325
+            "y": 115
           },
           "id": 35,
           "options": {
@@ -7850,7 +7850,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\ndata = from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      _field:\r\n        if r._field == \"dc_medal_get_0\" then \"Normal\"\r\n        else if r._field == \"dc_medal_get_1\" then \"Orange (Roulette)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"Green\"\r\n        else if r._field == \"dc_medal_get_3\" then \"Pink\"\r\n        else if r._field == \"dc_medal_get_4\" then \"Purple\"\r\n        else if r._field == \"dc_medal_get_5\" then \"Cyan\"\r\n        else if r._field == \"dc_medal_get_6\" then \"Wall Medal\"\r\n        else if r._field == \"dc_medal_get_7\" then \"SP Medal\"\r\n        else if r._field == \"dc_medal_get_12\" then \"Green x10\"\r\n        else if r._field == \"dc_medal_get_13\" then \"Red x10\"\r\n        else if r._field == \"dc_medal_get_14\" then \"Purple x10\"\r\n        else if r._field == \"dc_medal_get_15\" then \"Gold\"\r\n        else if r._field == \"dc_medal_get_16\" then \"Gold Bar\"\r\n        else if r._field == \"dc_medal_get_17\" then \"Gold Bar x10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"Large Gold\"\r\n        else if r._field == \"dc_medal_get_19\" then \"Large Gold x10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"Large Gold x100\"\r\n        else if r._field == \"dc_medal_get_21\" then \"Unknown Currency\"\r\n        else if r._field == \"dc_medal_get_100\" then \"Rainbow\"\r\n        else if r._field == \"dc_medal_get_101\" then \"Gold (Bot Frame)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"Sapphire\"\r\n        else if r._field == \"dc_medal_get_103\" then \"Ruby\"\r\n        else if r._field == \"dc_medal_get_104\" then \"Emerald\"\r\n        else if r._field == \"dc_medal_get_105\" then \"Diamond\"\r\n        else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n  }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n\r\ntotals = data\r\n  |> group(columns: [\"_time\"])\r\n  |> sum(column: \"_value\")\r\n  |> rename(columns: {_value: \"total\"})\r\n\r\njoin(\r\n  tables: {d: data, t: totals},\r\n  on: [\"_time\"]\r\n)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _field: r._field,\r\n      _value: float(v: r._value) / float(v: r.total) * 100.0\r\n  }))\r\n  |> group(columns: [\"_field\"])\r\n",
@@ -8324,7 +8324,7 @@
             "h": 3,
             "w": 4,
             "x": 0,
-            "y": 328
+            "y": 118
           },
           "id": 6,
           "options": {
@@ -8344,7 +8344,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_in\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
@@ -8408,7 +8408,7 @@
             "h": 7,
             "w": 4,
             "x": 0,
-            "y": 331
+            "y": 121
           },
           "id": 58,
           "options": {
@@ -8433,7 +8433,7 @@
             "xTickLabelRotation": 0,
             "xTickLabelSpacing": 100
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_in\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: true, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)\r\n  |> fill(column: \"_value\", value: 0)\r\n",
@@ -8510,7 +8510,7 @@
             "h": 9,
             "w": 7,
             "x": 4,
-            "y": 335
+            "y": 125
           },
           "id": 70,
           "options": {
@@ -8526,7 +8526,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"medal_in\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> derivative(unit: 1s, nonNegative: true)\r\n  |> aggregateWindow(every: 5m, fn: mean, createEmpty: false)\r\n",
@@ -8564,7 +8564,7 @@
             "h": 9,
             "w": 13,
             "x": 11,
-            "y": 335
+            "y": 125
           },
           "id": 49,
           "options": {
@@ -8587,7 +8587,7 @@
             "textMode": "auto",
             "wideLayout": true
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "import \"strings\"\r\n\r\nfrom(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field =~ /^dc_medal_get_/)\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n  |> map(fn: (r) => ({\r\n        r with\r\n        _field:\r\n        if r._field == \"dc_medal_get_0\" then \"Normal\"\r\n        else if r._field == \"dc_medal_get_1\" then \"Orange (Roulette)\"\r\n        else if r._field == \"dc_medal_get_2\" then \"Green\"\r\n        else if r._field == \"dc_medal_get_3\" then \"Pink\"\r\n        else if r._field == \"dc_medal_get_4\" then \"Purple\"\r\n        else if r._field == \"dc_medal_get_5\" then \"Cyan\"\r\n        else if r._field == \"dc_medal_get_6\" then \"Wall Medal\"\r\n        else if r._field == \"dc_medal_get_7\" then \"SP Medal\"\r\n        else if r._field == \"dc_medal_get_12\" then \"Green x10\"\r\n        else if r._field == \"dc_medal_get_13\" then \"Red x10\"\r\n        else if r._field == \"dc_medal_get_14\" then \"Purple x10\"\r\n        else if r._field == \"dc_medal_get_15\" then \"Gold\"\r\n        else if r._field == \"dc_medal_get_16\" then \"Gold Bar\"\r\n        else if r._field == \"dc_medal_get_17\" then \"Gold Bar x10\"\r\n        else if r._field == \"dc_medal_get_18\" then \"Large Gold\"\r\n        else if r._field == \"dc_medal_get_19\" then \"Large Gold x10\"\r\n        else if r._field == \"dc_medal_get_20\" then \"Large Gold x100\"\r\n        else if r._field == \"dc_medal_get_21\" then \"Unknown Currency\"\r\n        else if r._field == \"dc_medal_get_100\" then \"Rainbow\"\r\n        else if r._field == \"dc_medal_get_101\" then \"Gold (Bot Frame)\"\r\n        else if r._field == \"dc_medal_get_102\" then \"Sapphire\"\r\n        else if r._field == \"dc_medal_get_103\" then \"Ruby\"\r\n        else if r._field == \"dc_medal_get_104\" then \"Emerald\"\r\n        else if r._field == \"dc_medal_get_105\" then \"Diamond\"\r\n          else strings.replace(v: r._field, t: \"dc_medal_get_\", u: \"ID:\", i: 1)\r\n      }))\r\n  |> keep(columns: [\"_time\", \"_field\", \"_value\"])\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> drop(columns: [\"_time\"])\r\n",
@@ -8663,7 +8663,7 @@
             "h": 6,
             "w": 4,
             "x": 0,
-            "y": 338
+            "y": 128
           },
           "id": 32,
           "options": {
@@ -8679,7 +8679,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.1",
+          "pluginVersion": "12.3.1",
           "targets": [
             {
               "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"dc_medal_get_7\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: true)\r\n  |> fill(column: \"_value\", usePrevious: true)",
