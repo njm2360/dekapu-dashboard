@@ -74,6 +74,26 @@ class MmpSaveData(BaseModel):
     bbox: Optional[int] = None  # 黒箱所有数
     bbox_all: Optional[int] = None  # 黒箱獲得数
     # blackbox_credits: Optional[int] = None  # 黒箱(Legacy)
+    bbox_shop: Optional[int] = None # ?
+
+    ferball_get: Optional[int] = None # フェレッタボール獲得数
+    ferlot_lot : Optional[int] = None # フェレッタチャンス抽選回数
+    jackfr_get_all : Optional[int] = None # フェレッタJACKPOT獲得回数
+    jackfr_get_t0 : Optional[int] = None # シングルフェレッタJACKPOT獲得回数
+    jackfr_get_t1 : Optional[int] = None # ダブルフェレッタJACKPOT獲得回数
+    jackfr_get_t2 : Optional[int] = None # マッシブフェレッタJACKPOT獲得回数
+    jackfr_get_t3 : Optional[int] = None # ヘブンフェレッタJACKPOT獲得回数
+    jackfr_get_t4 : Optional[int] = None # ギャラクシーフェレッタJACKPOT獲得回数
+    jackfr_startmax : Optional[int] = None # F-JPスタート値最高
+    jackfr_totalmax : Optional[int] = None # F-JP最終結果最高
+    ferlot_hit : Optional[int] = None # フェレッタ抽選当選回数
+    ferlot_lose : Optional[int] = None # フェレッタ抽選はずれ回数
+    ferlot_chance : Optional[int] = None # ?
+    ferlot_act : Optional[int] = None # ?
+    ferlot_lines : Optional[int] = None # ?
+
+    dc_bbox_shop: Optional[Dict[str, int]] = None  # ?
+    dc_ferlot_item: Optional[Dict[str, int]] = None  # ?
 
     model_config = ConfigDict(extra="ignore", strict=True)  # 未知フィールドは破棄する
 
@@ -104,6 +124,8 @@ class MmpSaveData(BaseModel):
         "dc_ball_chain",
         "dc_palball_get",
         "dc_palball_jp",
+        "dc_bbox_shop",
+        "dc_ferlot_item",
         mode="before",
     )
     def remove_null_field(cls, v):
