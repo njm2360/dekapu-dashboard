@@ -1,28 +1,20 @@
-# Stage 1: builder
-FROM python:3.13-slim AS builder
-
-# Install Python uv
-RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-ENV PATH="/root/.local/bin:${PATH}"
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
-COPY pyproject.toml uv.lock ./
-
-# Export dependencies
-RUN uv export -o requirements.txt
-
-# Stage 2: runtime
-FROM python:3.13-slim
-
-WORKDIR /app
-
-# Install dependencies
-COPY --from=builder /app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY go.mod go.sum ./
+RUN go mod download
 
 COPY . .
 
-CMD ["python", "main.py"]
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/watcher ./cmd/watcher
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/loader  ./cmd/loader
+
+FROM alpine:3.23.3
+
+WORKDIR /app
+
+COPY --from=builder /out/watcher ./watcher
+COPY --from=builder /out/loader  ./loader
+
+CMD ["/app/watcher"]

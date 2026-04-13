@@ -4,12 +4,8 @@
 
 .dockerignore
 
-__pycache__/
-*.py[cod]
-
-.venv/
-env/
-venv/
+*.exe
+*.test
 
 .env
 *.log
