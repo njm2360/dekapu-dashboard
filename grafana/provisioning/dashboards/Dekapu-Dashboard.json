@@ -477,7 +477,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 9,
+        "w": 12,
         "x": 6,
         "y": 8
       },
@@ -550,8 +550,8 @@
       },
       "gridPos": {
         "h": 14,
-        "w": 9,
-        "x": 15,
+        "w": 6,
+        "x": 18,
         "y": 8
       },
       "id": 24,
@@ -1071,7 +1071,7 @@
         "x": 12,
         "y": 16
       },
-      "id": 74,
+      "id": 51,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1092,11 +1092,69 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"l_achieve_count\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "実績獲得数",
+      "title": "タスク完了数",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 15,
+        "y": 16
+      },
+      "id": 89,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"get_medaltower\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "メダルタワー獲得数",
       "type": "stat"
     },
     {
@@ -1245,7 +1303,7 @@
         "x": 6,
         "y": 19
       },
-      "id": 51,
+      "id": 74,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -1266,11 +1324,11 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"task_cnt\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"l_achieve_count\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "タスク完了数",
+      "title": "実績獲得数",
       "type": "stat"
     },
     {
@@ -1387,6 +1445,64 @@
         }
       ],
       "title": "黒箱獲得率",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 15,
+        "y": 19
+      },
+      "id": 88,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"bbox_shop\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "黒箱ショップ利用数",
       "type": "stat"
     },
     {
@@ -2945,11 +3061,11 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"bbox_shop\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"ferlot_maxln\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
           "refId": "A"
         }
       ],
-      "title": "黒箱ショップ利用数",
+      "title": "ビンゴ最大同時ライン",
       "type": "stat"
     },
     {
@@ -5392,6 +5508,6 @@
   "timezone": "browser",
   "title": "でかプ実績",
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
-  "version": 93,
+  "version": 94,
   "weekStart": ""
 }
