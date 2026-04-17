@@ -43,6 +43,8 @@ services:
         target: /app/vrchat_log
         read_only: true
     environment:
+      - DATA_DIR=/app/data
+      - VRCHAT_LOG_DIR=/app/vrchat_log
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
       - INFLUXDB_ORG=${INFLUXDB_ORG}
