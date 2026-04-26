@@ -4,15 +4,18 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	"github.com/joho/godotenv"
+	"github.com/schollz/progressbar/v3"
 
 	"log-parser/internal/analysis"
 	"log-parser/internal/envutil"
@@ -24,16 +27,7 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	scanner := bufio.NewScanner(os.Stdin)
-
-	startDT := promptDatetime(scanner, "開始日時 (YYYYMMDDHHmmss, 空白=制限なし): ")
-	endDT := promptDatetime(scanner, "終了日時 (YYYYMMDDHHmmss, 空白=制限なし): ")
-
-	if !confirmSettings(scanner, startDT, endDT) {
-		return
-	}
-
-	logDir := envutil.Default("VRCHAT_LOG_DIR", "/app/vrchat_log")
+	logDir := envutil.Require("VRCHAT_LOG_DIR")
 
 	opts := influxdb2.DefaultOptions().
 		SetHTTPRequestTimeout(uint(10 * time.Second / time.Millisecond))
@@ -46,6 +40,15 @@ func main() {
 
 	writeAPI := client.WriteAPIBlocking(envutil.Require("INFLUXDB_ORG"), envutil.Require("INFLUXDB_BUCKET"))
 
+	scanner := bufio.NewScanner(os.Stdin)
+
+	startDT := promptDatetime(scanner, "開始日時 (YYYYMMDDHHmmss, 空白=制限なし): ")
+	endDT := promptDatetime(scanner, "終了日時 (YYYYMMDDHHmmss, 空白=制限なし): ")
+
+	if !confirmSettings(scanner, startDT, endDT) {
+		return
+	}
+
 	files := collectLogFiles(logDir)
 	if len(files) == 0 {
 		log.Printf("[Loader] No log files found in %s", logDir)
@@ -53,14 +56,33 @@ func main() {
 	}
 
 	total := 0
-	for _, fpath := range files {
+	for i, fpath := range files {
 		fname := filepath.Base(fpath)
 		p := parser.NewMmpLogParser(fname)
 		medalRate := analysis.NewMedalRateEMA(20.0)
 
-		log.Printf("[Loader] Processing %s", fname)
+		info, err := os.Stat(fpath)
+		if err != nil {
+			log.Fatalf("[Loader] Cannot stat %s: %v", fname, err)
+		}
 
-		if err := processFile(fpath, fname, p, medalRate, writeAPI, startDT, endDT, &total); err != nil {
+		bar := progressbar.NewOptions64(
+			info.Size(),
+			progressbar.OptionSetDescription(fmt.Sprintf("[%d/%d] %s", i+1, len(files), fname)),
+			progressbar.OptionSetWidth(40),
+			progressbar.OptionShowBytes(true),
+			progressbar.OptionShowCount(),
+			progressbar.OptionOnCompletion(func() { fmt.Println() }),
+			progressbar.OptionSetTheme(progressbar.Theme{
+				Saucer:        "=",
+				SaucerHead:    ">",
+				SaucerPadding: " ",
+				BarStart:      "[",
+				BarEnd:        "]",
+			}),
+		)
+
+		if err := processFile(fpath, fname, p, medalRate, writeAPI, startDT, endDT, &total, bar); err != nil {
 			log.Fatalf("[Loader] Aborting due to write error: %v", err)
 		}
 	}
@@ -75,6 +97,7 @@ func processFile(
 	writeAPI influx.BlockingWriteAPI,
 	startDT, endDT *time.Time,
 	total *int,
+	bar *progressbar.ProgressBar,
 ) error {
 	f, err := os.Open(fpath)
 	if err != nil {
@@ -83,7 +106,7 @@ func processFile(
 	}
 	defer f.Close()
 
-	sc := bufio.NewScanner(f)
+	sc := bufio.NewScanner(io.TeeReader(f, bar))
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())
 		if line == "" {
@@ -136,40 +159,21 @@ func writeWithRetry(api influx.BlockingWriteAPI, rec *model.MmpSaveRecord, delta
 		} else {
 			log.Printf("[Loader] Write attempt %d failed: %v", i+1, err)
 		}
-		time.Sleep(3 * time.Second)
+		if i < maxRetry-1 {
+			time.Sleep(3 * time.Second)
+		}
 	}
 	return fmt.Errorf("write failed after %d attempts", maxRetry)
 }
 
-// collectLogFiles returns output_log_*.txt files deduped by basename (ascending).
+// collectLogFiles returns output_log_*.txt files sorted ascending by path.
 func collectLogFiles(logDir string) []string {
 	entries, err := filepath.Glob(filepath.Join(logDir, "output_log_*.txt"))
 	if err != nil {
 		return nil
 	}
-	seen := make(map[string]string)
-	for _, p := range entries {
-		base := filepath.Base(p)
-		if _, dup := seen[base]; !dup {
-			seen[base] = p
-		}
-	}
-	keys := make([]string, 0, len(seen))
-	for k := range seen {
-		keys = append(keys, k)
-	}
-	for i := range keys {
-		for j := i + 1; j < len(keys); j++ {
-			if keys[i] > keys[j] {
-				keys[i], keys[j] = keys[j], keys[i]
-			}
-		}
-	}
-	result := make([]string, len(keys))
-	for i, k := range keys {
-		result[i] = seen[k]
-	}
-	return result
+	sort.Strings(entries)
+	return entries
 }
 
 func promptDatetime(sc *bufio.Scanner, prompt string) *time.Time {

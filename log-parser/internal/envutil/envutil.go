@@ -1,6 +1,7 @@
 package envutil
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -14,11 +15,11 @@ func Require(key string) string {
 	return ""
 }
 
-func Default(key, def string) string {
+func Get(key string) (string, error) {
 	if v := os.Getenv(key); v != "" {
-		return v
+		return v, nil
 	}
-	return def
+	return "", fmt.Errorf("required environment variable %s is not set", key)
 }
 
 func Bool(key string, def bool) bool {

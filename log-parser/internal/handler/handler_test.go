@@ -46,7 +46,7 @@ const (
 )
 
 func savedataLine(userID, sig string, creditAll int64) string {
-	data := fmt.Sprintf(`{"version":1,"lastsave":1700000000,"credit_all":%d}`, creditAll)
+	data := fmt.Sprintf(`{"version":1,"lastsave":1700000000,"credit_all":%d,"medal_in":100}`, creditAll)
 	params := url.Values{}
 	params.Set("data", data)
 	params.Set("user_id", userID)
