@@ -112,7 +112,7 @@ func buildV4URL(dataJSON, userID, sig string) string {
 	return u.String()
 }
 
-const minimalDataJSON = `{"version":1,"firstboot":0,"lastsave":0,"hide_record":0,"credit":0,"playtime":0,"credit_all":100}`
+const minimalDataJSON = `{"version":1,"firstboot":0,"lastsave":0,"hide_record":0,"credit":0,"playtime":0,"credit_all":100,"medal_in":100}`
 
 // v1 URL から UserID・Sig・RawURL・CreditAll がすべて正しくパースされる。
 func TestParseSavedata_V1_Success(t *testing.T) {
@@ -244,6 +244,56 @@ func TestParseSavedata_MultipleVersions(t *testing.T) {
 	}
 }
 
+// --- MedalIn バリデーション ---
+
+// medal_in が 0 のときは nil を返す（異常Join対策）。
+func TestParseSavedata_MedalIn_Zero_ReturnsNil(t *testing.T) {
+	data, _ := json.Marshal(map[string]any{
+		"version": 1, "firstboot": 0, "lastsave": 0,
+		"hide_record": 0, "credit": 0, "playtime": 0, "credit_all": 100,
+		"medal_in": 0,
+	})
+	if got := p.ParseLine(buildV1URL(string(data), "usr_abc", "sig")); got != nil {
+		t.Fatalf("expected nil when medal_in=0, got %+v", got)
+	}
+}
+
+// medal_in が 1 のときは nil を返す（異常Join対策）。
+func TestParseSavedata_MedalIn_One_ReturnsNil(t *testing.T) {
+	data, _ := json.Marshal(map[string]any{
+		"version": 1, "firstboot": 0, "lastsave": 0,
+		"hide_record": 0, "credit": 0, "playtime": 0, "credit_all": 100,
+		"medal_in": 1,
+	})
+	if got := p.ParseLine(buildV1URL(string(data), "usr_abc", "sig")); got != nil {
+		t.Fatalf("expected nil when medal_in=1, got %+v", got)
+	}
+}
+
+// medal_in が 2 のときは EventSavedataUpdate を返す。
+func TestParseSavedata_MedalIn_Two_ReturnsEvent(t *testing.T) {
+	data, _ := json.Marshal(map[string]any{
+		"version": 1, "firstboot": 0, "lastsave": 0,
+		"hide_record": 0, "credit": 0, "playtime": 0, "credit_all": 100,
+		"medal_in": 2,
+	})
+	got := p.ParseLine(buildV1URL(string(data), "usr_abc", "sig"))
+	if got == nil || got.Event != EventSavedataUpdate {
+		t.Fatalf("expected EventSavedataUpdate when medal_in=2, got %v", got)
+	}
+}
+
+// medal_in フィールドがない（nil）ときは nil を返す。
+func TestParseSavedata_MedalIn_Missing_ReturnsNil(t *testing.T) {
+	data, _ := json.Marshal(map[string]any{
+		"version": 1, "firstboot": 0, "lastsave": 0,
+		"hide_record": 0, "credit": 0, "playtime": 0, "credit_all": 100,
+	})
+	if got := p.ParseLine(buildV1URL(string(data), "usr_abc", "sig")); got != nil {
+		t.Fatalf("expected nil when medal_in is missing, got %+v", got)
+	}
+}
+
 // --- FlexInt: 文字列・数値両形式 ---
 
 // credit_all が JSON 文字列形式で渡された場合も正しく整数としてパースされる（FlexInt）。
@@ -251,7 +301,7 @@ func TestParseSavedata_FlexInt_StringValue(t *testing.T) {
 	data, _ := json.Marshal(map[string]any{
 		"version": 1, "firstboot": 0, "lastsave": 0,
 		"hide_record": 0, "credit": 0, "playtime": 0,
-		"credit_all": "999",
+		"credit_all": "999", "medal_in": 100,
 	})
 	rawURL := buildV1URL(string(data), "usr_abc", "sig")
 	got := p.ParseLine(rawURL)
