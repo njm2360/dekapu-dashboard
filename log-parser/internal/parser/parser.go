@@ -85,6 +85,9 @@ func (p *MmpLogParser) ParseLine(line string) *ParseResult {
 		if record == nil {
 			return nil
 		}
+		if record.Data.MedalIn == nil || *record.Data.MedalIn <= 1 {
+			return nil // 異常Join時に無効なデータが出る対策
+		}
 		return &ParseResult{Event: EventSavedataUpdate, Record: record}
 	}
 
