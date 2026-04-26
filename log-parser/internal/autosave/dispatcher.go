@@ -92,16 +92,12 @@ func (q *SaveDispatcher) Close() {
 	q.mu.Unlock()
 
 	if pending > 0 {
-		log.Printf("[AutoSave] Waiting for %d pending request(s)", pending)
+		log.Printf("[AutoSave] Discarding %d pending request(s) on shutdown", pending)
 	}
 
 	q.cancel()
 	close(q.done)
 	q.wg.Wait()
-
-	if pending > 0 {
-		log.Printf("[AutoSave] All requests done")
-	}
 }
 
 func (q *SaveDispatcher) getOrCreateWorker(userID string) *userWorker {
