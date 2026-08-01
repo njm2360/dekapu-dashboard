@@ -25,16 +25,18 @@ type handler struct {
 	lastRecord       *model.MmpSaveRecord
 	pendingLeaveSave bool
 	hasUnsavedRecord bool
+	lastAchieveCount int
 }
 
 func NewHandler(label string, w influx.PointWriter, a SaveManager, enableAutosave bool) watcher.LineHandler {
 	h := &handler{
-		label:          label,
-		parser:         parser.NewMmpLogParser(label),
-		medalRate:      analysis.NewMedalRateEMA(20.0),
-		influx:         w,
-		autoSave:       a,
-		enableAutosave: enableAutosave,
+		label:            label,
+		parser:           parser.NewMmpLogParser(label),
+		medalRate:        analysis.NewMedalRateEMA(20.0),
+		influx:           w,
+		autoSave:         a,
+		enableAutosave:   enableAutosave,
+		lastAchieveCount: -1,
 	}
 	return func(_ string, line string) {
 		h.handleLine(line)
@@ -98,6 +100,10 @@ func (h *handler) handleSavedataUpdate(record *model.MmpSaveRecord) {
 		return
 	}
 
+	achieveCount := len(record.Data.LAchieve)
+	achievementIncreased := h.lastAchieveCount >= 0 && achieveCount > h.lastAchieveCount
+	h.lastAchieveCount = achieveCount
+
 	if h.pendingLeaveSave {
 		h.pendingLeaveSave = false
 		if h.autoSave.TrySave(record, true) {
@@ -106,5 +112,8 @@ func (h *handler) handleSavedataUpdate(record *model.MmpSaveRecord) {
 		return
 	}
 
-	h.hasUnsavedRecord = !h.autoSave.TrySave(record, false)
+	if achievementIncreased {
+		log.Printf("[%s] Achievement count increased to %d. Forcing immediate save.", h.label, achieveCount)
+	}
+	h.hasUnsavedRecord = !h.autoSave.TrySave(record, achievementIncreased)
 }
