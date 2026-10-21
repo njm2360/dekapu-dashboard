@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: log-parser/go.mod
+
+      - name: Test
+        working-directory: log-parser
+        run: go test ./...
+
+      - name: Build (windows/amd64)
+        working-directory: log-parser
+        env:
+          CGO_ENABLED: 0
+          GOOS: windows
+          GOARCH: amd64
+        run: |
+          go build -trimpath -ldflags="-s -w" -o "$GITHUB_WORKSPACE/dist/watcher.exe" ./cmd/watcher
+          go build -trimpath -ldflags="-s -w" -o "$GITHUB_WORKSPACE/dist/loader.exe" ./cmd/loader
+
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum watcher.exe loader.exe > SHA256SUMS.txt
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            dist/watcher.exe dist/loader.exe dist/SHA256SUMS.txt
