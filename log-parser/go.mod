@@ -1,6 +1,6 @@
 module log-parser
 
-go 1.26
+go 1.27
 
 require (
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
