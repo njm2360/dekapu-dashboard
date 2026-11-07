@@ -196,7 +196,13 @@ type MmpSaveData struct {
 	DcFerlotUseitem IntMap `json:"dc_ferlot_useitem,omitempty"` // 種類別アイテムポケット使用数
 
 	GetMedalTower *int `json:"get_medaltower,omitempty"` // メダルタワー獲得数
-	FrtAll        *int `json:"frt_all,omitempty"`        // でかプの苗木獲得数
+	FrtAll        *int `json:"frt_all,omitempty"`        // でかプの実獲得数
+
+	LTreePerks  []int    `json:"l_tree_perks,omitempty"` // ラフラパークの現在のレベル一覧
+	TreeNext    *FlexInt `json:"tree_next,omitempty"`    // でかプの木の次の実が成熟するUnix時刻
+	TreeStock   *int     `json:"tree_stock,omitempty"`   // でかプの木の未回収の実の数
+	LafraGet    *int     `json:"lafra_get,omitempty"`    // ラフラボール獲得数
+	LafraSkills *int     `json:"lafra_skills,omitempty"` // ラフラスキルのビットマスク
 }
 
 func (d *MmpSaveData) DumpForInflux() map[string]any {
