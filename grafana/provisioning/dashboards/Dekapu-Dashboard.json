@@ -43,7 +43,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 91,
+      "id": 92,
       "title": "統計",
       "type": "row"
     },
@@ -93,7 +93,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -193,7 +193,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -304,7 +304,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -373,7 +373,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -433,7 +433,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -525,7 +525,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -649,7 +649,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -709,7 +709,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -769,7 +769,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -829,7 +829,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -889,7 +889,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -949,7 +949,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1009,7 +1009,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1069,7 +1069,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1129,7 +1129,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1189,7 +1189,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1249,7 +1249,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1309,7 +1309,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1369,7 +1369,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1429,7 +1429,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1489,7 +1489,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1549,7 +1549,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1609,7 +1609,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1620,7 +1620,7 @@
           "refId": "A"
         }
       ],
-      "title": "でかプの苗木",
+      "title": "でかプの実",
       "type": "stat"
     },
     {
@@ -1631,7 +1631,7 @@
         "x": 0,
         "y": 22
       },
-      "id": 92,
+      "id": 93,
       "title": "JACKPOT",
       "type": "row"
     },
@@ -1681,7 +1681,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1741,7 +1741,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1801,7 +1801,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1861,7 +1861,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -1985,7 +1985,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2045,7 +2045,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2105,7 +2105,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2165,7 +2165,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2225,7 +2225,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2317,7 +2317,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2377,7 +2377,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2437,7 +2437,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2497,7 +2497,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2589,7 +2589,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2649,7 +2649,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2709,7 +2709,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2769,7 +2769,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2865,7 +2865,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2925,7 +2925,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -2985,7 +2985,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3045,7 +3045,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3105,7 +3105,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3165,7 +3165,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3225,7 +3225,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3338,7 +3338,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3430,7 +3430,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3530,7 +3530,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3552,7 +3552,7 @@
         "x": 0,
         "y": 46
       },
-      "id": 93,
+      "id": 94,
       "title": "すごろく",
       "type": "row"
     },
@@ -3602,7 +3602,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3662,7 +3662,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3755,7 +3755,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3847,7 +3847,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -3969,7 +3969,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4037,7 +4037,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4097,7 +4097,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4157,7 +4157,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4217,7 +4217,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4239,7 +4239,7 @@
         "x": 0,
         "y": 56
       },
-      "id": 94,
+      "id": 95,
       "title": "トーテム",
       "type": "row"
     },
@@ -4292,7 +4292,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4454,7 +4454,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4476,7 +4476,7 @@
         "x": 0,
         "y": 63
       },
-      "id": 95,
+      "id": 96,
       "title": "ボール",
       "type": "row"
     },
@@ -4526,7 +4526,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4617,7 +4617,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4705,7 +4705,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4765,7 +4765,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4777,6 +4777,66 @@
         }
       ],
       "title": " 最大ボールナンバー",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "beyps6l9ombk0e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        }
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 0,
+        "y": 70
+      },
+      "id": 91,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "beyps6l9ombk0e"
+          },
+          "query": "from(bucket: \"dekapu-log\")\r\n  |> range(start: -1d)\r\n  |> filter(fn: (r) => r._measurement == \"mpp-savedata\")\r\n  |> filter(fn: (r) => r._field == \"lafra_get\")\r\n  |> filter(fn: (r) => r.user == \"${user}\")\r\n  |> last()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "ラフラボール獲得数",
       "type": "stat"
     },
     {
@@ -4843,7 +4903,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 70
+        "y": 73
       },
       "id": 33,
       "options": {
@@ -4865,7 +4925,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4928,7 +4988,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -4993,7 +5053,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5056,7 +5116,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5078,7 +5138,7 @@
         "x": 0,
         "y": 88
       },
-      "id": 96,
+      "id": 97,
       "title": "メダル",
       "type": "row"
     },
@@ -5128,7 +5188,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5216,7 +5276,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5306,7 +5366,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5366,7 +5426,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5458,7 +5518,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 100
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5559,7 +5619,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5622,7 +5682,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5722,7 +5782,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "13.2.3",
+      "pluginVersion": "13.3.0",
       "targets": [
         {
           "datasource": {
@@ -5795,7 +5855,7 @@
   },
   "timezone": "browser",
   "title": "でかプ実績",
-  "version": 101,
+  "version": 102,
   "uid": "3c5b522f-0576-4cf2-8bfa-bb3faf99c710",
   "id": 1
 }
